@@ -48,3 +48,12 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# CSVs
+*.csv
+*.CSV
+*.csv.zip
+*.CSV.ZIP
+
+# DBs
+*.sqlitedb

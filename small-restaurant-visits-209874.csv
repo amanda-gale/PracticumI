@@ -1,0 +1,11 @@
+"RestaurantID","ServerEmpID","ServerName","VisitDate","VisitTime","MealType","PartySize","WaitTime","CustomerName","CustomerPhone","CustomerEmail","LoyaltyMember","FoodBill","TipAmount","FoodDiscountPercentage","PaymentMethod","orderedAlcohol","AlcoholBill"
+101,48840,"Harris, Victoria","2025-06-15","05:31","Breakfast",1,0,"Kasimir Hogan","(214) 786-2748","at.velit@web.net",TRUE,7.34,1.47,0.1,"Mobile Payment","no",0
+111,NA,"N/A","2021-04-15","","Breakfast",3,0,"","","",FALSE,17.85,3.57,0,"Credit Card","no",0
+109,23112,"Hernandez, Charlotte","2020-09-24","13:21","Lunch",4,0,"","","",FALSE,46.71,9.34,0,"Mobile Payment","no",0
+102,46646,"Perez, Jacob","2022-10-27","11:26","Lunch",2,10,"","","",FALSE,28.71,4.31,0,"Cash","no",0
+105,65176,"Adams, Chloe","2024-06-26","19:42","Dinner",1,4,"","","",FALSE,20.71,1.69,0,"Credit Card","yes",11.25
+112,47168,"Wilson, James","2024-03-02","12:28","Lunch",4,10,"","","",FALSE,28.45,8.54,0,"Cash","no",0
+106,NA,"N/A","2023-04-15","19:49","Dinner",2,10,"","","",FALSE,36.82,9.2,0,"Cash","no",0
+103,12772,"Brown, Olivia","2021-11-11","14:46","Lunch",1,0,"Dana Lewis","(352) 147-6255","at@hotmail.org",TRUE,10.41,2.6,0.15,"Credit Card","no",0
+106,NA,"N/A","2020-08-10","20:51","Dinner",2,0,"Brenden Watkins","(418) 381-0715","orci.quis@protonmail.ca",TRUE,47.56,4.5,0.1,"Mobile Payment","yes",22.5
+112,39257,"Robinson, Ava","2023-11-04","11:13","Breakfast",1,1,"","","",FALSE,6.64,1.99,0,"Mobile Payment","no",0

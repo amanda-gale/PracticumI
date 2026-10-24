@@ -1,0 +1,93 @@
+Project Structure:
+- Logical data model
+- Relational schema
+- Cloud Database
+- Load data into DB
+- Execute SQL queries
+- Analyze Data
+
+### Files required
+
+Prelim:
+- sandbox 1: partition data
+- sandbox 2: data inspection
+
+Part A: Configure Cloud Database
+- sandbox 3: test DB connection
+
+Part B: Design Normalized Database
+- designDBSchema.PractI.LastNameF.Rmd
+
+Part C: Realize Database
+- createDB.PractI.LastNameF.R: DB creation file
+- schema.LastNameF.sql: load CREATE statements from here into createDB
+
+Part D: Delete Database
+- deleteDB.PractI.LastNameF.R: DROP tables if exist
+
+Part E: Populate Database
+- loadDB.PractI.LastNameF.R: load the csv into the database
+
+Part F: Test Data Loading Process
+- testDBLoading.PractI.LastNameF.R: check DB data against CSV data
+
+Part G: Add Business Logic
+- configBusinessLogic.PractI.LastNameF.R: create stored procedures
+
+Part H: Dashboard for Reporting & Analytics
+- script to launch analytics dashboard
+
+
+
+Weird Rules:
+- name all code chunks
+- use functions to structure code
+- normalize DB schema to 3NF
+- embed LaTeX equations for part B
+- knit to PDF, not HTML
+- add lookup tables for categorical variables
+- always disconnect from DB
+- use sqldf to do grouping but not much else, it is slow
+- In R, if you want to change a global variable (one used first outside a function), 
+then you need to use a special assignment operator: <<- instead of <-. 
+- watch out for dates R vs SQL format
+
+Installing Packages
+```{r} 
+install.packages("pacman")
+pacman::p_load(ggplot2, tidyr, dplyr)
+```
+
+MySQL & SQLite Syntax Notes
+- Using mixed upper and lower case for table names sometimes causes issues with 
+dbSendStatement() and dbWriteTable() when using MySQL; make all table names and
+attributes names fully lower case
+
+- The function dbWriteTable() is disabled for bulk loading on the MySQL cloud 
+installation on db4free and Aiven.
+
+-Put columns or tables that contain special character such as period (.) or have 
+names that are keywords into backticks,
+
+- If you get a message "Can't initialize character set unknown", see 
+https://stackoverflow.com/questions/52613809/rmysql-error-cant-initialize-character-set-unknownLinks 
+to an external site. and https://github.com/pBlueG/SA-MP-MySQL/issues/203Links to an external site.
+
+-There appears to be a bug in MySQL stored procedures that contain a SELECT as 
+the last statement in the procedure; if you get the message "Commands out of sync; 
+you can't run this command now", you must use INTO with your SELECT; see 
+https://stackoverflow.com/questions/6583020/mysql-stored-procedure-caused-commands-out-of-sync
+
+- SQLite and MySQL are weird about Booleans. Use type `TINYINT` instead.
+
+- Columns in Aiven must be enclosed in single quotes rather than double quotes
+
+
+
+Practicum Qs that impact DB design:
+count the number of unique restaurants, customers, servers, and visits in the CSV 
+and compare against the total number of rows in the appropriate tables. 
+Sum up the total amount spent on food, alcohol, and tips in the CSV and compare 
+against the same in the database. Compare your results with your fellow learners.
+
+

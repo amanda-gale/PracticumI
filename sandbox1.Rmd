@@ -1,0 +1,39 @@
+---
+title: "Data Exploration"
+author: "Gale, Amanda"
+date: "2026-10-23"
+output: html_document
+---
+
+## Create Testing File
+```{r}
+if (not file.exists("small-restaurant-visits-209874.csv")) {
+  fn <- "restaurant-visits-209874.csv"
+
+  # read the first 10 rows of the csv into a data frame
+  some_lines <- read.csv(fn, nrows = 10)
+
+  # create a smaller version of the csv for testing
+  write.csv(some_lines, "small-restaurant-visits-209874.csv", row.names = FALSE)
+}
+```
+
+## Data Exploration
+```{r}
+df <- read.csv("small-restaurant-visits-209874.csv")
+str(df)
+```
+```{r}
+conn <- dbConnect(RSQLite::SQLite(), "restaurants-db-02102026.sqlitedb")
+dbListTables(conn)
+```
+
+```{r}
+dbListFields(conn, "restaurants")
+dbReadTable(conn, "restaurants")
+```
+
+```{r}
+dbReadTable(conn, "servers")
+```
+
