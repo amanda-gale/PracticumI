@@ -7,7 +7,7 @@ output: html_document
 
 ## Create Testing File
 ```{r}
-if (not file.exists("small-restaurant-visits-209874.csv")) {
+if  (!file.exists("small-restaurant-visits-209874.csv")) {
   fn <- "restaurant-visits-209874.csv"
 
   # read the first 10 rows of the csv into a data frame
@@ -35,5 +35,9 @@ dbReadTable(conn, "restaurants")
 
 ```{r}
 dbReadTable(conn, "servers")
+```
+
+```{r}
+dbDisconnect(conn)
 ```
 
