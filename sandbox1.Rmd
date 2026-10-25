@@ -6,6 +6,12 @@ output: html_document
 ---
 
 ## Create Testing File
+
+```{r}
+library(RSQLite)
+library(DBI)
+```
+
 ```{r}
 if  (!file.exists("small-restaurant-visits-209874.csv")) {
   fn <- "restaurant-visits-209874.csv"
@@ -36,6 +42,53 @@ dbReadTable(conn, "restaurants")
 ```{r}
 dbReadTable(conn, "servers")
 ```
+
+
+```{sql connection = conn}
+SELECT sql FROM sqlite_master WHERE type='table' AND name='servers';
+```
+
+
+```{sql connection = conn}
+SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'restaurants';
+```
+
+```{sql connection = dbcon}
+DROP TABLE IF EXISTS raw_csv_data;
+```
+
+```{sql connection = dbcon}
+CREATE TABLE raw_csv_data (
+    RestaurantID            INT,
+    ServerEmpID             INT,
+    ServerName              VARCHAR(100),
+    VisitDate               DATE,
+    VisitTime               TIME,
+    MealType                VARCHAR(20),
+    PartySize               INT,
+    WaitTime                INT,
+    CustomerName            VARCHAR(100),
+    CustomerPhone           VARCHAR(20),
+    CustomerEmail           VARCHAR(255),
+    LoyaltyMember           BOOLEAN,
+    FoodBill                DECIMAL(10,2),
+    TipAmount               DECIMAL(10,2),
+    FoodDiscountPercentage  DECIMAL(4,2),
+    PaymentMethod           VARCHAR(30),
+    orderedAlcohol          VARCHAR(3),
+    AlcoholBill             DECIMAL(10,2)
+);
+```
+
+```{r}
+df.full <- read.csv("restaurant-visits-209874.csv")
+```
+
+
+```{r}
+dbWriteTable(dbcon, "raw_csv_data", df.full, append = TRUE, row.names = FALSE)
+``` 
+
 
 ```{r}
 dbDisconnect(conn)
