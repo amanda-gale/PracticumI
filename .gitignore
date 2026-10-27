@@ -58,3 +58,6 @@ rsconnect/
 
 # DBs
 *.sqlitedb
+
+# HTMLs
+*.html

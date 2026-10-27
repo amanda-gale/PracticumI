@@ -5,6 +5,69 @@ date: "Fall 2026"
 output: html_document
 ---
 
+---
+
+## Functional Dependencies
+
+### Tables
+\begin{aligned}
+\texttt{restaurants.rid} &\to \texttt{servers.rid}\\
+\texttt{visits.visittime} &\to \texttt{bill.billid}\\
+\texttt{paymentmethods.pmid} &\to \texttt{bill.pmid}\\
+\texttt{visits.serverempid} &\to \texttt{restaurants.rid}\\
+\texttt{visits.restaurantid} &\to \texttt{customers.cid}\\
+\texttt{visits.waittime} &\to \texttt{mealtypes.mtid}\\
+\texttt{visits.visitdate} &\to \texttt{servers.empid}\\
+\end{aligned}
+
+### restaurants 
+\begin{aligned}
+\texttt{restaurants.rid} &\to \texttt{servers.rid}\\
+\texttt{visits.serverempid} &\to \texttt{restaurants.rid}\\
+\end{aligned}
+
+### servers 
+\begin{aligned}
+\texttt{empID} &\to \texttt{servername},\ \texttt{startdatehired},\ \texttt{enddatehired},\ \texttt{hourlyrate},\\
+&\quad \texttt{birthdate},\ \texttt{ssn},\ \texttt{rid}
+\end{aligned}
+
+
+### customers
+\begin{aligned}
+\texttt{visits.restaurantid} &\to \texttt{customers.cid}\\
+\end{aligned}
+
+### visits 
+\begin{aligned}
+\texttt{visits.visittime} &\to \texttt{bill.billid}\\
+\texttt{visits.serverempid} &\to \texttt{restaurants.rid}\\
+\texttt{visits.restaurantid} &\to \texttt{customers.cid}\\
+\texttt{visits.waittime} &\to \texttt{mealtypes.mtid}\\
+\texttt{visits.visitdate} &\to \texttt{servers.empid}\\
+\end{aligned}
+
+### bill
+\begin{aligned}
+\texttt{visits.visittime} &\to \texttt{bill.billid}\\
+\texttt{paymentmethods.pmid} &\to \texttt{bill.pmid}\\
+\end{aligned}
+
+### paymentmethods
+\begin{aligned}
+\texttt{paymentmethods.pmid} &\to \texttt{bill.pmid}\\
+\end{aligned}
+
+### mealtypes 
+\begin{aligned}
+\texttt{visits.waittime} &\to \texttt{mealtypes.mtid}\\
+\end{aligned}
+
+</br>
+
+## Entity Relationship Diagram 
+
+
 
 
 
