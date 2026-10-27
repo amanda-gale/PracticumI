@@ -61,27 +61,120 @@ DROP TABLE IF EXISTS raw_csv_data;
 CREATE TABLE raw_csv_data (
     RestaurantID            INT,
     ServerEmpID             INT,
-    ServerName              VARCHAR(100),
+    ServerName              TEXT,
     VisitDate               DATE,
     VisitTime               TIME,
-    MealType                VARCHAR(20),
+    MealType                TEXT,
     PartySize               INT,
     WaitTime                INT,
-    CustomerName            VARCHAR(100),
-    CustomerPhone           VARCHAR(20),
-    CustomerEmail           VARCHAR(255),
+    CustomerName            TEXT,
+    CustomerPhone           TEXT,
+    CustomerEmail           TEXT,
     LoyaltyMember           BOOLEAN,
-    FoodBill                DECIMAL(10,2),
-    TipAmount               DECIMAL(10,2),
-    FoodDiscountPercentage  DECIMAL(4,2),
-    PaymentMethod           VARCHAR(30),
-    orderedAlcohol          VARCHAR(3),
-    AlcoholBill             DECIMAL(10,2)
-);
+    FoodBill                NUMERIC(10,2),
+    TipAmount               NUMERIC(10,2),
+    FoodDiscountPercentage  NUMERIC(4,2),
+    PaymentMethod           TEXT,
+    orderedAlcohol          BOOLEAN,
+    AlcoholBill             NUMERIC(10,2),
+
+    CONSTRAINT chk_restaurant_id  CHECK (RestaurantID > 0),
+    CONSTRAINT chk_server_emp_id  CHECK (ServerEmpID > 0),
+    CONSTRAINT chk_visit_date     CHECK (VisitDate BETWEEN '2018-01-01' AND '2026-12-31'),
+    CONSTRAINT chk_meal_type      CHECK (MealType IN ('Breakfast', 'Lunch', 'Dinner', 'Take-Out')),
+    CONSTRAINT chk_party_size     CHECK (PartySize BETWEEN 1 AND 25),
+    CONSTRAINT chk_wait_time      CHECK (WaitTime BETWEEN 0 AND 240),
+    CONSTRAINT chk_customer_email CHECK (CustomerEmail = '' OR CustomerEmail LIKE '%_@_%._%'),
+    CONSTRAINT chk_loyalty        CHECK (LoyaltyMember IN (0, 1)),
+    CONSTRAINT chk_food_bill      CHECK (FoodBill >= 0),
+    CONSTRAINT chk_tip_amount     CHECK (TipAmount >= 0),
+    CONSTRAINT chk_discount       CHECK (FoodDiscountPercentage BETWEEN 0 AND 1),
+    CONSTRAINT chk_payment_method CHECK (PaymentMethod IN ('Cash', 'Credit Card', 'Mobile Payment')),
+    CONSTRAINT chk_ordered_alc    CHECK (orderedAlcohol IN (0, 1)),
+    CONSTRAINT chk_alcohol_bill   CHECK (AlcoholBill >= 0),
+    CONSTRAINT chk_alcohol_consistent CHECK (orderedAlcohol = 1 OR AlcoholBill = 0)
+)
 ```
 
 ```{r}
-df.full <- read.csv("restaurant-visits-209874.csv")
+df <- read.csv("restaurant-visits-209874.csv", colClasses = "character", na.strings = "NA", stringsAsFactors = FALSE,
+                    check.names = FALSE)
+df <- df.full
+```
+
+```{r}
+wt <- which(df$WaitTime < 0 | df$WaitTime > 240)
+df$WaitTime[wt]
+```
+```{r}
+rid <- which(df$RestaurantID < 0 | typeof(df$RestaurantID) != "integer")
+df$RestaurantID[rid]
+```
+
+
+```{r}
+sid <- which(df$ServerEmpID < 0 | typeof(df$ServerEmpID) != "integer")
+df$ServerEmpID[sid]
+```
+
+```{r}
+vd <- which(df$VisitDate == '0000-00-00')
+df$visitDate[vd]
+```
+
+```{r}
+mt <- which(!df$MealType %in% c('Breakfast', 'Lunch', 'Dinner', 'Take-Out'))
+df$MealType[mt]
+```
+
+```{r}
+ps <- which(df$PartySize < 1 | df$PartySize > 25)
+df$PartySize[ps]
+```
+
+```{r}
+email <- which(!grepl("^\\S+@\\S+\\.\\S+$", df$CustomerEmail) & df$CustomerEmail != "")
+df$CustomerEmail[email]
+```
+```{r}
+loyalty <- which(!df$LoyaltyMember %in% c(0, 1))
+df$LoyaltyMember[loyalty]
+```
+
+```{r}
+bad.foodbill    <- which(df.full$FoodBill < 0)
+
+bad.tip         <- which(df.full$TipAmount < 0)
+
+bad.discount    <- which(df.full$FoodDiscountPercentage < 0 | df.full$FoodDiscountPercentage > 1)
+
+bad.payment     <- which(!df.full$PaymentMethod %in% c("Cash", "Credit Card", "Mobile Payment"))
+
+bad.orderedalc  <- which(!df.full$orderedAlcohol %in% c("yes", "no"))
+
+bad.alcoholbill <- which(df.full$AlcoholBill < 0)
+
+bad.alcconsist  <- which(df.full$orderedAlcohol == "no" & df.full$AlcoholBill != 0)
+ 
+```
+
+```{r}
+sapply(list(foodbill    = bad.foodbill,
+            tip         = bad.tip,
+            discount    = bad.discount,
+            payment     = bad.payment,
+            orderedalc  = bad.orderedalc,
+            alcoholbill = bad.alcoholbill,
+            alcconsist  = bad.alcconsist),
+       length)
+
+
+```
+
+
+
+```{sql connection = dbcon}
+SELECT version();
 ```
 
 
@@ -93,4 +186,6 @@ dbWriteTable(dbcon, "raw_csv_data", df.full, append = TRUE, row.names = FALSE)
 ```{r}
 dbDisconnect(conn)
 ```
+
+
 

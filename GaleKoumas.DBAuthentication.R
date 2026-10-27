@@ -1,6 +1,6 @@
 library(DBI)
 
-conn <- dbConnect(
+dbcon <- dbConnect(
   RMariaDB::MariaDB(),
   host     = "ph.ms",
   port     = 3306,
@@ -11,6 +11,6 @@ conn <- dbConnect(
 
 sqlq <- "SHOW DATABASES;"
 
-print(dbGetQuery(conn, sqlq))
+print(dbGetQuery(dbcon, sqlq))
 
 dbDisconnect(conn)
