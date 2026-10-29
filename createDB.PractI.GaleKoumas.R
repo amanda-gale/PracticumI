@@ -1,6 +1,8 @@
 
-library(DBI)
-library(RMariaDB)
+if (!requireNamespace("pacman", quietly = TRUE)) {
+  install.packages("pacman")
+}
+suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB))
 
 main <- function() {
   # Connect to the MariaDB database

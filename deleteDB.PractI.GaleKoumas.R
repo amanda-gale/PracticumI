@@ -6,7 +6,7 @@
 
 delete_table <- function(con, table) {
   print(paste0("Deleting table ", table))
-  tbl_exists <- dbExecute(con, paste0("DROP TABLE IF EXISTS ", table, ";"))
+  dbExecute(con, paste0("DROP TABLE IF EXISTS ", table, ";"))
 }
 
 
@@ -15,7 +15,7 @@ main <- function() {
   if (!requireNamespace("pacman", quietly = TRUE)) {
     install.packages("pacman")
   }
-  pacman::p_load(DBI, RMariaDB)
+  suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB))
   
   dbcon <- dbConnect(
   RMariaDB::MariaDB(),
