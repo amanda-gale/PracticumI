@@ -37,7 +37,14 @@ dbListTables(conn)
 ```{r}
 dbListFields(conn, "restaurants")
 dbReadTable(conn, "restaurants")
+dbGetQuery(conn, "PRAGMA table_info(restaurants);")
 ```
+```{sql connection=conn}
+SELECT MAX(LENGTH(State)) FROM Restaurants;
+``` 
+```{sql connection=conn}
+SELECT MAX(LENGTH(ServerName)) FROM Servers;
+``` 
 
 ```{r}
 dbReadTable(conn, "servers")
@@ -171,16 +178,19 @@ sapply(list(foodbill    = bad.foodbill,
 
 ```
 
-
-
-```{sql connection = dbcon}
-SELECT version();
+```{r}
+for (i in 1:18) {
+  if (anyNA(df[,i])) {
+    print("Null values in column:")
+    print(colnames(df[i]))
+  } else {
+    print("No Null values found in col")
+    print(colnames(df[i]))
+  }
+}
 ```
 
 
-```{r}
-dbWriteTable(dbcon, "raw_csv_data", df.full, append = TRUE, row.names = FALSE)
-``` 
 
 
 ```{r}
