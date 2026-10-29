@@ -41,7 +41,6 @@ insert_data <- function(dbc, table, data) {
 
 main <- function() {
   
-  
   # --- Connect to MariaDB ---
   dbcon <- dbConnect(
     RMariaDB::MariaDB(),

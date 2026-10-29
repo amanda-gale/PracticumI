@@ -3,6 +3,10 @@
 # Amanda Gale
 # Fall 2026
 
+if (!requireNamespace("pacman", quietly = TRUE)) {
+  install.packages("pacman")
+}
+suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB))
 
 delete_table <- function(con, table) {
   print(paste0("Deleting table ", table))
@@ -11,11 +15,6 @@ delete_table <- function(con, table) {
 
 
 main <- function() {
-  
-  if (!requireNamespace("pacman", quietly = TRUE)) {
-    install.packages("pacman")
-  }
-  suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB))
   
   dbcon <- dbConnect(
   RMariaDB::MariaDB(),
