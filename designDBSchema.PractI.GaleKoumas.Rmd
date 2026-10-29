@@ -2,7 +2,9 @@
 title: 'Part B: Design Normalized Database'
 author: "Gale Koumas"
 date: "Fall 2026"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ---
@@ -67,7 +69,9 @@ output: html_document
 
 ## Entity Relationship Diagram 
 
-
+```{r}
+knitr::include_graphics("erd.png")
+```
 
 
 

@@ -61,3 +61,7 @@ rsconnect/
 
 # HTMLs
 *.html
+
+*.log
+*.tex
+*.png
