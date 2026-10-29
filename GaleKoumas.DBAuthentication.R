@@ -13,4 +13,6 @@ sqlq <- "SHOW DATABASES;"
 
 print(dbGetQuery(dbcon, sqlq))
 
-dbDisconnect(conn)
+print(dbListTables(dbcon))
+
+dbDisconnect(dbcon)

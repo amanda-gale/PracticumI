@@ -5,10 +5,8 @@
 
 
 delete_table <- function(con, table) {
+  print(paste0("Deleting table ", table))
   tbl_exists <- dbExecute(con, paste0("DROP TABLE IF EXISTS ", table, ";"))
-  if (tbl_exists > 0) {
-    print(paste0("Deleted table ", table, "."))
-  }
 }
 
 
