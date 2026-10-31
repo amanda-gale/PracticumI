@@ -63,6 +63,7 @@ main <- function() {
   # Main function workflow:
   # Connect to both SQLite and MySQL DBs
   # Ensure that required tables exist in MySQL SB
+  # Clear existing data from DB tables
   # Clean CSV data
   # Save SQLite data locally
   # Organize data to MySQL schema 
@@ -71,6 +72,7 @@ main <- function() {
   
 
   # --- Connect to MariaDB ---
+  
   dbcon <- dbConnect(
     RMariaDB::MariaDB(),
     host     = "ph.ms",
@@ -91,11 +93,15 @@ main <- function() {
     # Halt execution is a table is non-existent
     check_table_existence(dbcon, tbl)
   }
+  
+  
+  
+  # --- Clear Existing Data ---
   clear_tables(dbcon, tables)
   
   
   
-  # --- Load Data into Data Frames ---
+  # --- Load Data ---
   
   # Load CSV data into a data frame
   df.data <-  read.csv("small-restaurant-visits-209874.csv")
@@ -139,6 +145,13 @@ main <- function() {
   df.data$billid <- seq_len(nrow(df.data))
   df.data$visitid <- seq_len(nrow(df.data))
   
+  # Remove duplicate primary key from the servers table
+  df.servers <- distinct(df.servers)
+  # Two servers got raises, keep their higher pay rate
+  df.servers <- df.servers[-5,]    
+  df.servers <- df.servers[-2,]
+  
+  
   # Check data
   str(df.data)
   str(df.servers)
@@ -148,7 +161,6 @@ main <- function() {
   
   # --- Create Data Frames for DB Tables ---          
 
-  
   # Load restaurants
   # just change col names to lowercase
   df.restaurants <- df.restaurants %>%
@@ -191,6 +203,25 @@ main <- function() {
            birthdate = BirthDate,
            ssn = SSN)
   
+  
+  
+  # --- Populate DB Part 1 ---
+  
+  data_tables <- list(
+    restaurants = df.restaurants,
+    customers = df.customers,
+    paymentmethods = df.paymentmethods,
+    mealtypes = df.mealtypes,
+    servers = df.servers
+  )
+  
+  for (tbl in names(data_tables)) {
+    if (!insert_data(dbcon, tbl, data_tables[[tbl]])) {
+      stop("Load halted at table '", tbl, "'.", call. = FALSE)
+    }
+  }
+  
+  
   # Load bill
   db.paymentmethods <- dbReadTable(dbcon, "paymentmethods")
   
@@ -231,15 +262,10 @@ main <- function() {
             !anyNA(df.visits$billid))
 
   
-  # --- Load Tables ---
+  
+  # --- Populate DB Part 2 ---
 
-  # Create a named list for all tables and data
    data_tables <- list(
-     restaurants = df.restaurants,
-     customers = df.customers,
-     paymentmethods = df.paymentmethods,
-     mealtypes = df.mealtypes,
-     servers = df.servers,
      bill = df.bill,
      visits = df.visits
    )
