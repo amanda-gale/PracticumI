@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS restaurants (
 
 CREATE TABLE IF NOT EXISTS customers (
   cid INTEGER PRIMARY KEY,
-  customername VARCHAR(50) NOT NULL,
+  customername VARCHAR(50) DEFAULT NULL,
   customerphone VARCHAR(20) DEFAULT NULL,
   customeremail VARCHAR(50) DEFAULT NULL CHECK (CustomerEmail = '' OR CustomerEmail LIKE '%_@_%._%'),
   loyaltymember TINYINT(1) NOT NULL DEFAULT 0 CHECK (loyaltymember IN (0, 1))
