@@ -5,26 +5,40 @@ date: "2026-10-30"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+```{r}
+library(RSQLite)
+library(DBI)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+conn <- dbConnect(RSQLite::SQLite(), "restaurants-db-02102026.sqlitedb")
+dbListTables(conn)
 ```
 
-## Including Plots
+```{r}
+df <- read.csv("restaurant-visits-209874.csv", na.strings = "NA", stringsAsFactors = FALSE,
+                    check.names = FALSE)
 
-You can also embed plots, for example:
+df.servers <- dbReadTable(conn, "servers")
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+df.restaurants <- dbReadTable(conn, "restaurants")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+str(df)
+```
+
+
+
+```{r}
+anyDuplicated(df.customers[, c("customername", "customerphone", "customeremail")])
+```
+```{r}
+df.customers %>% count(customeremail) %>% filter(n > 1)
+```
+
+```{r}
+colSums(is.na(df.customers))
+```
+
