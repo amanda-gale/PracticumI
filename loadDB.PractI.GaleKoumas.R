@@ -48,7 +48,7 @@ insert_data <- function(dbc, table, data) {
   tryCatch({
     dbWithTransaction(
       dbc, 
-      dbWriteTable(dbc, table, df, append = TRUE, row.names = FALSE)
+      dbWriteTable(dbc, table, data, append = TRUE, row.names = FALSE)
     )
     TRUE
   }, error = function(e) {
