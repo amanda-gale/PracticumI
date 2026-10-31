@@ -5,7 +5,7 @@
 
 
 if (!requireNamespace("pacman", quietly = TRUE)) {
-  install.packages("pacman")
+  install.packages("pacman", repos = "https://cloud.r-project.org")
 }
 suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB, RSQLite, testthat))
 
@@ -13,22 +13,22 @@ main <- function() {
   
   dbcon <- dbConnect(
     RMariaDB::MariaDB(),
-    host     = Sys.getenv("DB_HOST"),
-    port     = as.integer(Sys.getenv("DB_PORT")),
-    dbname   = Sys.getenv("DB_NAME"),
-    user     = Sys.getenv("DB_USER"),
-    password = Sys.getenv("DB_PASS")
+    host     = "ph.ms",
+    port     = 3306,
+    dbname   = "Restaurant_Project",
+    user     = "cs5200practicum",
+    password = "galekoumasfall2026"
   )
   on.exit(dbDisconnect(dbcon), add = TRUE)
   
   conn <- dbConnect(SQLite(), "restaurants-db-02102026.sqlitedb")
   on.exit(dbDisconnect(conn), add = TRUE)
   
-  df.data <- read.csv("restaurant-visits-209874.csv")
+  df.data <- read.csv("small-restaurant-visits-209874.csv")
   
-  test_that("restaurant total rows equals CSV total rows", {
+  test_that("restaurant total rows equals SQLite total rows", {
     rs <- dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM restaurants")
-    expect_equal(rs$n, length(unique(df.data$RestaurantID)))
+    expect_equal(rs$n, dbGetQuery(conn, "SELECT COUNT(*) AS n FROM restaurants")$n)
   })
   
   test_that("customer total rows equals CSV total rows", {
@@ -36,9 +36,9 @@ main <- function() {
     expect_equal(rs$n, length(unique(df.data$CustomerEmail[df.data$CustomerEmail != ""])))
   })
   
-  test_that("server total rows equals CSV total rows", {
+  test_that("server total rows equals SQLite total rows", {
     rs <- dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM servers")
-    expect_equal(rs$n, length(unique(na.omit(df.data$ServerEmpID))))
+    expect_equal(rs$n, length(unique(dbReadTable(conn, "servers")$EmpID)))
   })
   
   test_that("visit total rows equals CSV", {
