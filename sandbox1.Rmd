@@ -106,7 +106,6 @@ CREATE TABLE raw_csv_data (
 ```{r}
 df <- read.csv("restaurant-visits-209874.csv", colClasses = "character", na.strings = "NA", stringsAsFactors = FALSE,
                     check.names = FALSE)
-df <- df.full
 ```
 
 ```{r}
@@ -190,6 +189,9 @@ for (i in 1:18) {
 }
 ```
 
+```{r}
+
+```
 
 
 

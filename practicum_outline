@@ -91,3 +91,42 @@ Sum up the total amount spent on food, alcohol, and tips in the CSV and compare
 against the same in the database. Compare your results with your fellow learners.
 
 
+Tests:
+foreign keys track
+visitid = billid
+all categoricals are in categories
+
+
+
+(5 pts / 2 hrs) Create a stored procedure in MySQL (note that if you used SQLite, 
+then you cannot complete this step) that adds a new visit to the database. Name 
+the stored procedure `storeNewVisit`. The stored procedure should take the necessary 
+arguments. You may assume that the restaurant and server already exist. Build a 
+testing harness that demonstrates that the stored procedure works for both a pass 
+and fail scenario. Show that the stored procedure works in a separate testing file 
+named "testBusinessLogic.R".
+
+Config SP
+# connect to DB
+# dependency installation
+# make sure tables exist
+# clear stored procedures
+# define new stored procedures
+
+
+test SP
+# connect to DB
+# dependency installation
+# make sure tables exist
+# make sure tables are populated..?
+# make sure SP exist
+# test SP
+# Pass/Fail
+
+
+
+"CREATED "
+
+
+
+

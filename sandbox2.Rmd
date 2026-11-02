@@ -21,12 +21,14 @@ df <- read.csv("restaurant-visits-209874.csv", na.strings = "NA", stringsAsFacto
                     check.names = FALSE)
 
 df.servers <- dbReadTable(conn, "servers")
-
+df.servers
+length(unique(df.servers$EmpID))
 df.restaurants <- dbReadTable(conn, "restaurants")
 ```
 
 ```{r}
 str(df)
+length(na.omit(unique(df[, c("ServerEmpID")])))
 ```
 
 
@@ -41,4 +43,9 @@ df.customers %>% count(customeremail) %>% filter(n > 1)
 ```{r}
 colSums(is.na(df.customers))
 ```
+
+```{r}
+anyDuplicated(df.servers$EmpID)
+```
+
 
