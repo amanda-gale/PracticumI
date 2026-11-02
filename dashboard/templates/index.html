@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Restaurant Group Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --whitewash: #f6f8fa;
+    --sky: #cfe6f7;
+    --cyclades: #2a7fc7;
+    --cyclades-deep: #1d5f9e;
+    --shutter: #8ec5ec;
+    --olive: #6f7f2c;
+    --olive-leaf: #8e9e4c;
+    --olive-pale: #c9d3a3;
+    --ink: #13324f;
+    --ink-soft: #4a6178;
+    --ink-muted: #6e8196;
+    --grid: rgba(19, 50, 79, 0.08);
+    --display: "Marcellus", Georgia, serif;
+    --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--whitewash); }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    font-family: var(--body);
+    background:
+      radial-gradient(900px 520px at 80% -8%, rgba(142, 197, 236, 0.55), transparent 62%),
+      radial-gradient(800px 600px at -5% 40%, rgba(201, 211, 163, 0.45), transparent 60%),
+      radial-gradient(1000px 700px at 60% 110%, rgba(142, 197, 236, 0.40), transparent 65%),
+      linear-gradient(180deg, var(--sky) 0%, var(--whitewash) 38%, var(--whitewash) 100%);
+    background-attachment: fixed;
+  }
+
+  /* Soft light on whitewashed walls, drifting slowly */
+  .glow { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+  .glow.one { width: 440px; height: 440px; background: var(--shutter); opacity: 0.35; top: 14%; left: 6%; }
+  .glow.two { width: 380px; height: 380px; background: var(--olive-pale); opacity: 0.45; top: 58%; right: 4%; }
+  @media (prefers-reduced-motion: no-preference) {
+    .glow.one { animation: drift 24s ease-in-out infinite alternate; }
+    .glow.two { animation: drift 30s ease-in-out infinite alternate-reverse; }
+    @keyframes drift { to { transform: translate(60px, -40px) scale(1.08); } }
+  }
+
+  .page { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 32px 24px 56px; }
+
+  /* Liquid glass over whitewash */
+  .glass {
+    position: relative;
+    background: linear-gradient(140deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.46) 55%, rgba(255,255,255,0.62) 100%);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,1),
+      inset 0 -1px 0 rgba(42,127,199,0.06),
+      0 14px 36px rgba(29, 95, 158, 0.12);
+    overflow: hidden;
+  }
+  .glass::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(120% 60% at 15% 0%, rgba(255,255,255,0.7), transparent 55%);
+    pointer-events: none;
+  }
+  .glass > * { position: relative; }
+
+  /* Greek key (meander) band in Cycladic blue */
+  .meander {
+    height: 22px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='22' viewBox='0 0 44 22'%3E%3Cpolyline points='0,19 30,19 30,3 8,3 8,14 22,14 22,8 15,8' fill='none' stroke='%232a7fc7' stroke-width='2.4'/%3E%3Cline x1='30' y1='19' x2='44' y2='19' stroke='%232a7fc7' stroke-width='2.4'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    background-size: 44px 22px;
+    opacity: 0.55;
+  }
+
+  /* Header: the one bold moment */
+  .hero { border-radius: 30px; padding: 36px 36px 0; margin-bottom: 22px; }
+  .hero-inner { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px; padding-bottom: 26px; }
+  .hero h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: 0.08em;
+    margin: 0;
+    color: var(--cyclades-deep);
+  }
+  .hero .about { max-width: 360px; font-size: 14px; line-height: 1.55; color: var(--ink-soft); margin: 0; }
+  .hero .meander { margin: 0 -36px; }
+  .olive-branch { position: absolute; top: 8px; right: 22px; width: 190px; height: auto; opacity: 0.9; }
+  .hero-inner .about { margin-top: 96px; }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 22px; }
+  .kpi { border-radius: 20px; padding: 18px 20px; }
+  .kpi .label { font-size: 13px; color: var(--ink-soft); }
+  .kpi .value { font-family: var(--display); font-size: 32px; margin-top: 8px; color: var(--ink); }
+  .kpi.olive .value { color: var(--olive); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(470px, 1fr)); gap: 18px; }
+  .card { border-radius: 24px; padding: 20px 20px 14px; min-width: 0; }
+  .card h2 { font-family: var(--display); font-weight: 400; font-size: 21px; margin: 0 0 4px; color: var(--cyclades-deep); }
+  .card .sub { font-size: 13px; color: var(--ink-muted); margin: 0 0 14px; }
+  .chart { position: relative; height: 320px; }
+  .wide { grid-column: 1 / -1; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+  th { color: var(--ink-soft); font-weight: 500; }
+  tbody tr:hover { background: rgba(42, 127, 199, 0.06); }
+  .table-wrap { overflow-x: auto; }
+
+  footer { margin-top: 28px; text-align: center; }
+  footer .meander { margin-bottom: 14px; }
+  footer svg { width: 140px; height: auto; opacity: 0.85; }
+  footer p { font-size: 13px; color: var(--ink-muted); margin: 6px 0 0; }
+
+  @media (max-width: 560px) {
+    .page { padding: 20px 16px 40px; }
+    .grid { grid-template-columns: 1fr; }
+    .hero { padding: 76px 20px 0; }
+    .hero .meander { margin: 0 -20px; }
+    .olive-branch { width: 150px; right: 6px; top: 6px; opacity: 0.6; }
+    .hero-inner .about { margin-top: 0; }
+    .chart { height: 280px; }
+  }
+</style>
+</head>
+<body>
+<div class="glow one" aria-hidden="true"></div>
+<div class="glow two" aria-hidden="true"></div>
+
+<div class="page">
+  <header class="hero glass">
+    <svg class="olive-branch" viewBox="0 0 230 120" aria-hidden="true">
+      <path d="M8 108 C 70 92, 140 62, 222 14" fill="none" stroke="#5f6e24" stroke-width="2.5" stroke-linecap="round"/>
+      <g fill="#8e9e4c">
+        <ellipse cx="40" cy="92" rx="17" ry="5.5" transform="rotate(-40 40 92)"/>
+        <ellipse cx="62" cy="96" rx="17" ry="5.5" transform="rotate(25 62 96)"/>
+        <ellipse cx="88" cy="74" rx="18" ry="5.5" transform="rotate(-48 88 74)"/>
+        <ellipse cx="112" cy="80" rx="18" ry="5.5" transform="rotate(18 112 80)"/>
+        <ellipse cx="136" cy="54" rx="18" ry="5.5" transform="rotate(-52 136 54)"/>
+        <ellipse cx="160" cy="58" rx="17" ry="5.5" transform="rotate(12 160 58)"/>
+        <ellipse cx="184" cy="34" rx="16" ry="5" transform="rotate(-55 184 34)"/>
+        <ellipse cx="205" cy="36" rx="15" ry="5" transform="rotate(5 205 36)"/>
+      </g>
+      <g fill="#6f7f2c" opacity="0.55">
+        <ellipse cx="74" cy="84" rx="14" ry="4.5" transform="rotate(-30 74 84)"/>
+        <ellipse cx="148" cy="44" rx="14" ry="4.5" transform="rotate(-35 148 44)"/>
+      </g>
+      <g fill="#3f4a18">
+        <circle cx="100" cy="90" r="6"/>
+        <circle cx="172" cy="48" r="5.5"/>
+      </g>
+    </svg>
+    <div class="hero-inner">
+      <div>
+        <h1 aria-label="Restaurant Group Dashboard"><span aria-hidden="true">RΣSTΛURΛNT GRΩUP<br>DΛSHBΩΛRD</span></h1>
+      </div>
+      <p class="about">Visits, revenue, and customers across all fourteen restaurants, read live from the Practicum I MySQL database. CS 5200, Fall 2026. Amanda Gale and Priamos Koumas.</p>
+    </div>
+    <div class="meander" aria-hidden="true"></div>
+  </header>
+
+  <section class="kpis" aria-label="Key statistics">
+    <div class="kpi glass"><div class="label">Total visits</div><div class="value" id="kpi-visits"></div></div>
+    <div class="kpi glass"><div class="label">Unique customers</div><div class="value" id="kpi-customers"></div></div>
+    <div class="kpi glass"><div class="label">Food revenue</div><div class="value" id="kpi-food"></div></div>
+    <div class="kpi glass olive"><div class="label">Alcohol revenue</div><div class="value" id="kpi-alcohol"></div></div>
+    <div class="kpi glass"><div class="label">Tips</div><div class="value" id="kpi-tips"></div></div>
+    <div class="kpi glass"><div class="label">Average wait in minutes</div><div class="value" id="kpi-wait"></div></div>
+  </section>
+
+  <section class="grid">
+    <div class="card glass">
+      <h2>Visits per restaurant</h2>
+      <p class="sub">Number of visits recorded at each restaurant</p>
+      <div class="chart"><canvas id="visitsByRestaurant"></canvas></div>
+    </div>
+    <div class="card glass">
+      <h2>Revenue per restaurant</h2>
+      <p class="sub">Food and alcohol sales in dollars</p>
+      <div class="chart"><canvas id="revenueByRestaurant"></canvas></div>
+    </div>
+    <div class="card glass wide">
+      <h2>Revenue per month</h2>
+      <p class="sub">Food plus alcohol sales for each month</p>
+      <div class="chart"><canvas id="revenueByMonth"></canvas></div>
+    </div>
+    <div class="card glass">
+      <h2>Visits per year</h2>
+      <p class="sub">Total visits across all restaurants</p>
+      <div class="chart"><canvas id="visitsByYear"></canvas></div>
+    </div>
+    <div class="card glass">
+      <h2>Food and alcohol per year</h2>
+      <p class="sub">Sales in dollars</p>
+      <div class="chart"><canvas id="foodAlcoholByYear"></canvas></div>
+    </div>
+    <div class="card glass">
+      <h2>Unique customers per restaurant</h2>
+      <p class="sub">Customers who gave contact information</p>
+      <div class="chart"><canvas id="customersByRestaurant"></canvas></div>
+    </div>
+    <div class="card glass">
+      <h2>Visits by meal type</h2>
+      <p class="sub">Breakfast, lunch, dinner, and take-out</p>
+      <div class="chart"><canvas id="visitsByMeal"></canvas></div>
+    </div>
+    <div class="card glass wide">
+      <h2>Bills by payment method</h2>
+      <p class="sub">Number of bills paid each way</p>
+      <div class="chart" style="height: 220px"><canvas id="billsByPayment"></canvas></div>
+    </div>
+    <div class="card glass wide">
+      <h2>Restaurant summary</h2>
+      <p class="sub">The numbers behind the restaurant charts</p>
+      <div class="table-wrap"><table id="summary"></table></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="meander" aria-hidden="true"></div>
+    <svg viewBox="0 0 230 120" aria-hidden="true">
+      <path d="M8 108 C 70 92, 140 62, 222 14" fill="none" stroke="#5f6e24" stroke-width="2.5" stroke-linecap="round"/>
+      <g fill="#8e9e4c">
+        <ellipse cx="40" cy="92" rx="17" ry="5.5" transform="rotate(-40 40 92)"/>
+        <ellipse cx="62" cy="96" rx="17" ry="5.5" transform="rotate(25 62 96)"/>
+        <ellipse cx="88" cy="74" rx="18" ry="5.5" transform="rotate(-48 88 74)"/>
+        <ellipse cx="112" cy="80" rx="18" ry="5.5" transform="rotate(18 112 80)"/>
+        <ellipse cx="136" cy="54" rx="18" ry="5.5" transform="rotate(-52 136 54)"/>
+        <ellipse cx="160" cy="58" rx="17" ry="5.5" transform="rotate(12 160 58)"/>
+        <ellipse cx="184" cy="34" rx="16" ry="5" transform="rotate(-55 184 34)"/>
+        <ellipse cx="205" cy="36" rx="15" ry="5" transform="rotate(5 205 36)"/>
+      </g>
+      <g fill="#6f7f2c" opacity="0.55">
+        <ellipse cx="74" cy="84" rx="14" ry="4.5" transform="rotate(-30 74 84)"/>
+        <ellipse cx="148" cy="44" rx="14" ry="4.5" transform="rotate(-35 148 44)"/>
+      </g>
+      <g fill="#3f4a18">
+        <circle cx="100" cy="90" r="6"/>
+        <circle cx="172" cy="48" r="5.5"/>
+      </g>
+    </svg>
+    <p>Data refreshes from the database every five minutes.</p>
+  </footer>
+</div>
+
+<script>
+const DATA = {{ data | tojson }};
+
+const css = getComputedStyle(document.documentElement);
+const v = name => css.getPropertyValue(name).trim();
+const C = { sky: v('--cyclades'), gold: v('--olive'), marble: v('--ink-soft'), stone: v('--ink-muted'), grid: v('--grid') };
+
+const num = n => Math.round(n).toLocaleString('en-US');
+const money = n => '$' + Math.round(n).toLocaleString('en-US');
+const moneyShort = n => n >= 1e6 ? '$' + (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? '$' + (n / 1e3).toFixed(0) + 'K' : '$' + Math.round(n);
+
+const t = DATA.totals;
+document.getElementById('kpi-visits').textContent = num(t.visits);
+document.getElementById('kpi-customers').textContent = num(t.customers);
+document.getElementById('kpi-food').textContent = moneyShort(t.food);
+document.getElementById('kpi-alcohol').textContent = moneyShort(t.alcohol);
+document.getElementById('kpi-tips').textContent = moneyShort(t.tips);
+document.getElementById('kpi-wait').textContent = (t.avg_wait ?? 0).toFixed(1);
+
+Chart.defaults.font.family = 'Figtree, system-ui, sans-serif';
+Chart.defaults.color = C.marble;
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.tooltip.padding = 10;
+Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(19, 50, 79, 0.92)';
+Chart.defaults.plugins.tooltip.borderColor = 'rgba(255, 255, 255, 0.25)';
+Chart.defaults.plugins.tooltip.borderWidth = 1;
+Chart.defaults.plugins.tooltip.cornerRadius = 10;
+
+function axes(horizontal, fmt) {
+  const valueAxis = { grid: { color: C.grid }, border: { display: false }, ticks: { color: C.stone, callback: fmt } };
+  const catAxis = { grid: { display: false }, border: { color: C.grid }, ticks: { color: C.marble } };
+  return horizontal ? { x: valueAxis, y: catAxis } : { x: catAxis, y: valueAxis };
+}
+
+function bar(id, labels, datasets, opts = {}) {
+  const horizontal = opts.horizontal || false;
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: datasets.map(d => ({
+        borderRadius: 4, borderSkipped: 'start', borderColor: 'rgba(255, 255, 255, 0.9)', borderWidth: opts.stacked ? 1 : 0,
+        maxBarThickness: 26, ...d
+      }))
+    },
+    options: {
+      indexAxis: horizontal ? 'y' : 'x',
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: datasets.length > 1, position: 'top', align: 'start' },
+        tooltip: { callbacks: { label: c => ' ' + c.dataset.label + ': ' + (opts.tip || num)(c.raw) } }
+      },
+      scales: (() => {
+        const s = axes(horizontal, opts.tick || (n => num(n)));
+        if (opts.stacked) { s.x.stacked = true; s.y.stacked = true; }
+        return s;
+      })()
+    }
+  });
+}
+
+const restLabels = DATA.by_restaurant.map(r => r.restaurantname + ' (' + r.rid + ')');
+
+bar('visitsByRestaurant', restLabels,
+    [{ label: 'Visits', data: DATA.by_restaurant.map(r => r.visits), backgroundColor: C.sky }],
+    { horizontal: true });
+
+bar('revenueByRestaurant', restLabels, [
+    { label: 'Food', data: DATA.by_restaurant.map(r => r.food), backgroundColor: C.sky },
+    { label: 'Alcohol', data: DATA.by_restaurant.map(r => r.alcohol), backgroundColor: C.gold }
+  ], { horizontal: true, stacked: true, tip: money, tick: moneyShort });
+
+bar('visitsByYear', DATA.by_year.map(r => String(r.year)),
+    [{ label: 'Visits', data: DATA.by_year.map(r => r.visits), backgroundColor: C.sky }]);
+
+bar('foodAlcoholByYear', DATA.by_year.map(r => String(r.year)), [
+    { label: 'Food', data: DATA.by_year.map(r => r.food), backgroundColor: C.sky },
+    { label: 'Alcohol', data: DATA.by_year.map(r => r.alcohol), backgroundColor: C.gold }
+  ], { stacked: true, tip: money, tick: moneyShort });
+
+bar('customersByRestaurant', restLabels,
+    [{ label: 'Unique customers', data: DATA.by_restaurant.map(r => r.customers), backgroundColor: C.gold }],
+    { horizontal: true });
+
+bar('visitsByMeal', DATA.by_mealtype.map(r => r.mealtype),
+    [{ label: 'Visits', data: DATA.by_mealtype.map(r => r.visits), backgroundColor: C.sky }]);
+
+bar('billsByPayment', DATA.by_payment.map(r => r.paymentmethod),
+    [{ label: 'Bills', data: DATA.by_payment.map(r => r.bills), backgroundColor: C.gold }],
+    { horizontal: true });
+
+// Monthly revenue: a line with a soft glass fill beneath it
+const monthCanvas = document.getElementById('revenueByMonth');
+const fill = monthCanvas.getContext('2d').createLinearGradient(0, 0, 0, 320);
+fill.addColorStop(0, 'rgba(42, 127, 199, 0.28)');
+fill.addColorStop(1, 'rgba(42, 127, 199, 0)');
+new Chart(monthCanvas, {
+  type: 'line',
+  data: {
+    labels: DATA.by_month.map(r => r.month),
+    datasets: [{ label: 'Revenue', data: DATA.by_month.map(r => r.revenue), borderColor: C.sky, borderWidth: 2,
+                 backgroundColor: fill, fill: true, pointRadius: 0, pointHoverRadius: 5,
+                 pointHoverBackgroundColor: C.gold, pointHoverBorderColor: '#fff', tension: 0.25 }]
+  },
+  options: {
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' Revenue: ' + money(c.raw) } } },
+    scales: {
+      x: { grid: { display: false }, border: { color: C.grid }, ticks: { color: C.stone, maxTicksLimit: 12 } },
+      y: { grid: { color: C.grid }, border: { display: false }, ticks: { color: C.stone, callback: moneyShort } }
+    }
+  }
+});
+
+const rows = DATA.by_restaurant.map(r =>
+  `<tr><td>${r.rid}</td><td>${r.restaurantname}, ${r.city}</td><td>${num(r.visits)}</td><td>${num(r.customers)}</td>` +
+  `<td>${money(r.food)}</td><td>${money(r.alcohol)}</td><td>${money(r.tips)}</td></tr>`).join('');
+document.getElementById('summary').innerHTML =
+  '<thead><tr><th>ID</th><th>Restaurant</th><th>Visits</th><th>Unique customers</th><th>Food</th><th>Alcohol</th><th>Tips</th></tr></thead>' +
+  '<tbody>' + rows + '</tbody>';
+</script>
+</body>
+</html>

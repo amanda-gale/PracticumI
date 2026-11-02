@@ -65,3 +65,8 @@ rsconnect/
 *.log
 *.tex
 *.png
+
+# Dashboard
+.venv/
+__pycache__/
+!dashboard/templates/*.html
