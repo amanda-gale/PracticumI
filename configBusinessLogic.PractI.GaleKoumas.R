@@ -54,10 +54,18 @@ main <- function() {
   # --- Store information pertaining to a new visit ---
   
   # check for customer id, if not exists, store info
+  # SELECT customerid FROM customers WHERE customername = newValues.customername AND customerphone = newValues.customerphone AND customeremail = newValues.customeremail
   # Insert customer info, bill info
+  # INSERT INTO bill (foodbill, tipamount, 
+          # fooddiscountpercentage, orderedalcohol, alcoholbill
+          #(SELECT pmid FROM paymentmethods WHERE paymentmethod 
+                          # = newValues.paymentmethod) as pmid) 
+          # VALUES (newValues.billamount, newValues.billdate, newValues.paymentmethodid)
   # mt and payment info hopefully already exist 
-  # store visit info using select statements to get 
+  # SELECT mtid FROM mealtype WHERE mealtype = newValues.mealtype
+  # store visit info using select statements to get
   # corresponding customerid and mtids 
+  
   sqlq_storeNewVisit <- paste0(
   "CREATE PROCEDURE storeNewVisit(newValues)",
   "BEGIN",
