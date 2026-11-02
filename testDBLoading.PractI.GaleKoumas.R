@@ -28,6 +28,7 @@ main <- function() {
   test_that("Unique restaurants in CSV row count of restaurants table", {
     rs <- length(unique(df.data[, c("RestaurantID")]))
     ex <- dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM restaurants")$n 
+    ex <- as.numeric(ex)
     
     cat('\n')
     print(if (rs == ex) "MATCH" else "MISMATCH")
@@ -39,6 +40,7 @@ main <- function() {
   test_that("Unique servers in CSV row count of servers table", {
     rs <- length(unique(df.data[, c("ServerEmpID")]))
     ex <- dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM servers")$n 
+    ex <- as.numeric(ex)
     
     cat('\n')
     print(if (rs == ex) "MATCH" else "MISMATCH")
@@ -48,8 +50,11 @@ main <- function() {
   })
   
   test_that("Unique customers in CSV row count of customers table", {
-    rs <- nrow(unique(df.data[, c("CustomerName", "CustomerPhone", "CustomerEmail")]))
+    rs <- unique(df.data[, c("CustomerName", "CustomerPhone", "CustomerEmail")])
+    rs <- rs[!(is.na(rs$CustomerEmail) | rs$CustomerEmail == ""), ]
+    rs <- nrow(rs)
     ex <- dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM customers")$n 
+    ex <- as.numeric(ex)
     
     cat('\n')
     print(if (rs == ex) "MATCH" else "MISMATCH")
@@ -61,6 +66,7 @@ main <- function() {
   test_that("Unique visits in CSV row count of visits table", {
     rs <- nrow(df.data)   # each row in the CSV represents a unique visit
     ex <- dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM visits")$n 
+    ex <- as.numeric(ex)
     
     cat('\n')
     print(if (rs == ex) "MATCH" else "MISMATCH")
