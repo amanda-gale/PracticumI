@@ -9,61 +9,86 @@ output:
 
 ---
 
-## Functional Dependencies
+## Question 1: For the relation represented by all of the columns in the CSV file and the table in the SQLite database, define all functional dependencies and list them.
 
 ### Tables
+$$
 \begin{aligned}
-\texttt{restaurants.rid} &\to \texttt{servers.rid}\\
-\texttt{visits.visittime} &\to \texttt{bill.billid}\\
-\texttt{paymentmethods.pmid} &\to \texttt{bill.pmid}\\
-\texttt{visits.serverempid} &\to \texttt{restaurants.rid}\\
-\texttt{visits.restaurantid} &\to \texttt{customers.cid}\\
-\texttt{visits.waittime} &\to \texttt{mealtypes.mtid}\\
-\texttt{visits.visitdate} &\to \texttt{servers.empid}\\
+\texttt{servers.rid} &\to \texttt{restaurants.rid}\\
+\texttt{visits.billid} &\to \texttt{bill.billid}\\
+\texttt{bill.pmid} &\to \texttt{paymentmethods.pmid}\\
+\texttt{visits.serverempid} &\to \texttt{servers.empid}\\
+\texttt{visits.restaurantid} &\to \texttt{restaurants.rid}\\
+\texttt{visits.mtid} &\to \texttt{mealtypes.mtid}\\
+\texttt{visits.customerid} &\to \texttt{customers.cid}\\
 \end{aligned}
+$$
 
 ### restaurants 
+$$
 \begin{aligned}
-\texttt{restaurants.rid} &\to \texttt{servers.rid}\\
-\texttt{visits.serverempid} &\to \texttt{restaurants.rid}\\
+\texttt{restaurants.rid} &\to \texttt{restaurants.restaurantname}\\
+\texttt{restaurants.rid} &\to \texttt{restaurants.city}\\
+\texttt{restaurants.rid} &\to \texttt{restaurants.state}\\
+\texttt{restaurants.rid} &\to \texttt{restaurants.hastableservice}\\
 \end{aligned}
+$$
 
 ### servers 
+$$
 \begin{aligned}
-\texttt{empID} &\to \texttt{servername},\ \texttt{startdatehired},\ \texttt{enddatehired},\ \texttt{hourlyrate},\\
-&\quad \texttt{birthdate},\ \texttt{ssn},\ \texttt{rid}
+\texttt{empid} &\to \texttt{servername},\ \texttt{startdatehired},\ \texttt{enddatehired},\ \texttt{hourlyrate}\\
+\texttt{empid} &\to \texttt{birthdate},\ \texttt{ssn},\ \texttt{rid}
 \end{aligned}
-
+$$
 
 ### customers
+$$
 \begin{aligned}
-\texttt{visits.restaurantid} &\to \texttt{customers.cid}\\
+\texttt{customers.cid} &\to \texttt{customers.customername},\ \texttt{customers.customerphone},\ \texttt{customers.customeremail},\ \texttt{customers.loyaltymember}\\
 \end{aligned}
+$$
 
 ### visits 
+$$
 \begin{aligned}
-\texttt{visits.visittime} &\to \texttt{bill.billid}\\
-\texttt{visits.serverempid} &\to \texttt{restaurants.rid}\\
-\texttt{visits.restaurantid} &\to \texttt{customers.cid}\\
-\texttt{visits.waittime} &\to \texttt{mealtypes.mtid}\\
-\texttt{visits.visitdate} &\to \texttt{servers.empid}\\
+\texttt{visits.visitid} &\to \texttt{visits.visittime},\ 
+\texttt{visits.billid}\\
+\texttt{visits.visitid} &\to \texttt{visits.serverempid}\\
+\texttt{visits.visitid} &\to \texttt{visits.restaurantid},\ 
+\texttt{visits.customerid}\\
+\texttt{visits.visitid} &\to \texttt{visits.waittime},\ 
+\texttt{visits.mtid}\\
+\texttt{visits.visitid} &\to \texttt{visits.visitdate},\ 
+\texttt{visits.partysize}\\
 \end{aligned}
+$$
 
 ### bill
+$$
 \begin{aligned}
-\texttt{visits.visittime} &\to \texttt{bill.billid}\\
-\texttt{paymentmethods.pmid} &\to \texttt{bill.pmid}\\
+\texttt{bill.billid} &\to \texttt{bill.foodbill}\\
+\texttt{bill.billid} &\to \texttt{bill.tipamount},\ 
+\texttt{bill.fooddiscountpercentage}\\
+\texttt{bill.billid} &\to \texttt{bill.pmid},\ \texttt{bill.orderedalcohol},\ 
+\texttt{bill.alcoholbill}\\
 \end{aligned}
+$$
 
 ### paymentmethods
+$$
 \begin{aligned}
-\texttt{paymentmethods.pmid} &\to \texttt{bill.pmid}\\
+\texttt{paymentmethods.pmid} &\to 
+\texttt{paymentmethods.paymentmethod}\\
 \end{aligned}
+$$
 
 ### mealtypes 
+$$
 \begin{aligned}
-\texttt{visits.waittime} &\to \texttt{mealtypes.mtid}\\
+\texttt{mealtypes.mtid} &\to \texttt{mealtypes.mealtype}\\
 \end{aligned}
+$$
 
 </br>
 
