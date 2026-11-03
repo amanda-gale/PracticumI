@@ -112,15 +112,28 @@ sqlq_storeNewVisit <- function(con) {
 
 
 sqlq_modifyServer <- function(con) {
-  sql <- paste0("CREATE PROCEDURE modifyServer (IN id INTEGER, IN updatedname VARCHAR(50), IN updatedrate DECIMAL(4,2))",
+  sql <- paste0("CREATE PROCEDURE modifyServer(",
+                "  IN in_empid INTEGER,",
+                "  IN in_servername VARCHAR(50),",
+                "  IN in_hourlyrate DECIMAL(4,2)",
+                ")",
                 " BEGIN",
-                "   IF NOT EXISTS (SELECT 1 FROM servers WHERE empid = id) THEN",
+                "   IF NOT EXISTS (SELECT 1 FROM servers WHERE empid = in_empid) THEN",
                 "     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: no server found';",
                 "   END IF;",
+                "   IF in_servername IS NULL OR in_servername = '' THEN",
+                "     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: server name is required';",
+                "  END IF;",
+                "   IF in_hourlyrate IS NULL THEN",
+                "     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: hourly rate is required';",
+                "   END IF;",
+                "   IF in_hourlyrate < 0 THEN",
+                "     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: hourly rate cannot be negative';",
+                "   END IF;",
                 "   UPDATE servers",
-                "      SET servername = updatedname,",
-                "          hourlyrate = updatedrate",
-                "    WHERE empid = id;",
+                "      SET servername = in_servername,",
+                "          hourlyrate = in_hourlyrate",
+                "    WHERE empid = in_empid;",
                 " END")
   
   rs <- dbExecute(con, sql)
