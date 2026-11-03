@@ -9,6 +9,7 @@ output:
 
 ---
 
+<<<<<<< HEAD
 ## Question 1 
 For the relation represented by all of the columns in the CSV file and the table in the SQLite database, define all functional dependencies and list them.
 
@@ -26,6 +27,9 @@ $$
 $$
 
 ### Restaurants 
+=======
+### Servers
+>>>>>>> dcb75b63d2991367ecc55ab0f01d863d48c5edcc
 $$
 \begin{aligned}
 \texttt{restaurants.rid} &\to \texttt{restaurants.restaurantname}\\
@@ -43,10 +47,14 @@ $$
 \end{aligned}
 $$
 
-### Customers
+### Restaurants
 $$
 \begin{aligned}
+<<<<<<< HEAD
 \texttt{customers.cid} &\to \texttt{customers.customername},\ \texttt{customers.customerphone},\ \texttt{customers.customeremail},\ \texttt{customers.loyaltymember}\\
+=======
+\texttt{RestaurantID} &\to \texttt{RestaurantName},\ \texttt{City},\ \texttt{State},\ \texttt{hasTableService}
+>>>>>>> dcb75b63d2991367ecc55ab0f01d863d48c5edcc
 \end{aligned}
 $$
 
@@ -65,6 +73,7 @@ $$
 \end{aligned}
 $$
 
+<<<<<<< HEAD
 ### Bill
 $$
 \begin{aligned}
@@ -75,6 +84,16 @@ $$
 \texttt{bill.alcoholbill}\\
 \end{aligned}
 $$
+=======
+### Customers
+$$
+\begin{aligned}
+\texttt{CustomerEmail} &\to \texttt{CustomerName},\ \texttt{CustomerPhone},\ \texttt{LoyaltyMember}
+\end{aligned}
+$$
+
+## Question 2: Using the functional dependencies and the rules of normalization, decompose the relational from the CSV and the SQLite database into several relations that all satisfy 3NF; give the relations reasonable names.
+>>>>>>> dcb75b63d2991367ecc55ab0f01d863d48c5edcc
 
 ### Paymentmethods
 $$
@@ -103,3 +122,10 @@ knitr::include_graphics("erd.png")
 
 
 
+<<<<<<< HEAD
+=======
+1. It is in 2NF.
+2. No transitive dependencies exist. A transitive dependency occurs when a non-prime attribute is functionally dependent on another non-prime attribute. A non-prime attribute is an attribute that is not part of any candidate key of a relation.
+
+The original relation is in 1NF and 2NF because it has no repeating groups and the non-prime attributes depend on the entire primary key. However, values like RestaurantID repeat across many rows with their details, since non-prime attributes depend on other non-prime attributes (RestaurantID -> RestaurantName). By breaking it down into multiple tables, including lookup tables, no transitive dependencies exist, allowing for 3NF. Three more IDs were added when creating the new relations (billid, visitid, and cid) to make there is a way of identifying these tables.
+>>>>>>> dcb75b63d2991367ecc55ab0f01d863d48c5edcc
