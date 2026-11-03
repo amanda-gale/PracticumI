@@ -1,90 +1,30 @@
 ---
 title: 'Part B: Design Normalized Database'
-author: "Gale Koumas"
+author: "Amanda Gale & Priamos Koumas"
 date: "Fall 2026"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
----
-
-<<<<<<< HEAD
-## Question 1 
-For the relation represented by all of the columns in the CSV file and the table in the SQLite database, define all functional dependencies and list them.
-
-### Tables
-$$
-\begin{aligned}
-\texttt{servers.rid} &\to \texttt{restaurants.rid}\\
-\texttt{visits.billid} &\to \texttt{bill.billid}\\
-\texttt{bill.pmid} &\to \texttt{paymentmethods.pmid}\\
-\texttt{visits.serverempid} &\to \texttt{servers.empid}\\
-\texttt{visits.restaurantid} &\to \texttt{restaurants.rid}\\
-\texttt{visits.mtid} &\to \texttt{mealtypes.mtid}\\
-\texttt{visits.customerid} &\to \texttt{customers.cid}\\
-\end{aligned}
-$$
-
-### Restaurants 
-=======
-### Servers
->>>>>>> dcb75b63d2991367ecc55ab0f01d863d48c5edcc
-$$
-\begin{aligned}
-\texttt{restaurants.rid} &\to \texttt{restaurants.restaurantname}\\
-\texttt{restaurants.rid} &\to \texttt{restaurants.city}\\
-\texttt{restaurants.rid} &\to \texttt{restaurants.state}\\
-\texttt{restaurants.rid} &\to \texttt{restaurants.hastableservice}\\
-\end{aligned}
-$$
-
-### Servers 
-$$
-\begin{aligned}
-\texttt{empid} &\to \texttt{servername},\ \texttt{startdatehired},\ \texttt{enddatehired},\ \texttt{hourlyrate}\\
-\texttt{empid} &\to \texttt{birthdate},\ \texttt{ssn},\ \texttt{rid}
-\end{aligned}
-$$
+## Question 1: For the relation represented by all of the columns in the CSV file and the table in the SQLite database, define all functional dependencies and list them.
 
 ### Restaurants
 $$
 \begin{aligned}
-<<<<<<< HEAD
-\texttt{customers.cid} &\to \texttt{customers.customername},\ \texttt{customers.customerphone},\ \texttt{customers.customeremail},\ \texttt{customers.loyaltymember}\\
-=======
 \texttt{RestaurantID} &\to \texttt{RestaurantName},\ \texttt{City},\ \texttt{State},\ \texttt{hasTableService}
->>>>>>> dcb75b63d2991367ecc55ab0f01d863d48c5edcc
 \end{aligned}
 $$
 
-### Visits 
+### Servers
 $$
 \begin{aligned}
-\texttt{visits.visitid} &\to \texttt{visits.visittime},\ 
-\texttt{visits.billid}\\
-\texttt{visits.visitid} &\to \texttt{visits.serverempid}\\
-\texttt{visits.visitid} &\to \texttt{visits.restaurantid},\ 
-\texttt{visits.customerid}\\
-\texttt{visits.visitid} &\to \texttt{visits.waittime},\ 
-\texttt{visits.mtid}\\
-\texttt{visits.visitid} &\to \texttt{visits.visitdate},\ 
-\texttt{visits.partysize}\\
+\texttt{ServerEmpID} &\to \texttt{ServerName},\ \texttt{StartDateHired},\ \texttt{EndDateHired},\ \texttt{HourlyRate}\\
+\texttt{ServerEmpID} &\to \texttt{BirthDate},\ \texttt{SSN},\ \texttt{rID}\\
+\texttt{SSN} &\to \texttt{ServerEmpID}
 \end{aligned}
 $$
 
-<<<<<<< HEAD
-### Bill
-$$
-\begin{aligned}
-\texttt{bill.billid} &\to \texttt{bill.foodbill}\\
-\texttt{bill.billid} &\to \texttt{bill.tipamount},\ 
-\texttt{bill.fooddiscountpercentage}\\
-\texttt{bill.billid} &\to \texttt{bill.pmid},\ \texttt{bill.orderedalcohol},\ 
-\texttt{bill.alcoholbill}\\
-\end{aligned}
-$$
-=======
 ### Customers
 $$
 \begin{aligned}
@@ -92,40 +32,52 @@ $$
 \end{aligned}
 $$
 
+### Visits
+Each row of the CSV is one visit, which determines the rest of the row.
+$$
+\begin{aligned}
+\texttt{Visit} &\to \texttt{RestaurantID},\ \texttt{ServerEmpID},\ \texttt{CustomerEmail},\ \texttt{VisitDate},\ \texttt{VisitTime}\\
+\texttt{Visit} &\to \texttt{MealType},\ \texttt{PartySize},\ \texttt{WaitTime}\\
+\texttt{Visit} &\to \texttt{FoodBill},\ \texttt{TipAmount},\ \texttt{FoodDiscountPercentage},\ \texttt{PaymentMethod},\ \texttt{orderedAlcohol},\ \texttt{AlcoholBill}
+\end{aligned}
+$$
+
 ## Question 2: Using the functional dependencies and the rules of normalization, decompose the relational from the CSV and the SQLite database into several relations that all satisfy 3NF; give the relations reasonable names.
->>>>>>> dcb75b63d2991367ecc55ab0f01d863d48c5edcc
 
-### Paymentmethods
-$$
-\begin{aligned}
-\texttt{paymentmethods.pmid} &\to 
-\texttt{paymentmethods.paymentmethod}\\
-\end{aligned}
-$$
+Original relational form:
 
-### Mealtypes 
-$$
-\begin{aligned}
-\texttt{mealtypes.mtid} &\to \texttt{mealtypes.mealtype}\\
-\end{aligned}
-$$
+- RestaurantVisits(RestaurantID, RestaurantName, City, State, hasTableService, ServerEmpID, ServerName, StartDateHired, EndDateHired, HourlyRate, BirthDate, SSN, CustomerName, CustomerPhone, CustomerEmail, LoyaltyMember, VisitDate, VisitTime, MealType, PartySize, WaitTime, FoodBill, TipAmount, FoodDiscountPercentage, PaymentMethod, orderedAlcohol, AlcoholBill)
 
-</br>
+Relations in 3NF:
 
-## Entity Relationship Diagram 
+- restaurants(rid, restaurantname, city, state, hastableservice): RestaurantID -> RestaurantName, City, State, hasTableService
+- servers(empid, servername, startdatehired, enddatehired, hourlyrate, birthdate, ssn, rid): ServerEmpID -> ServerName, StartDateHired, EndDateHired, HourlyRate, BirthDate, SSN, rID
+- customers(cid, customername, customerphone, customeremail, loyaltymember): CustomerEmail -> CustomerName, CustomerPhone, LoyaltyMember
+- bill(billid, foodbill, tipamount, fooddiscountpercentage, pmid, orderedalcohol, alcoholbill): Visit -> FoodBill, TipAmount, FoodDiscountPercentage, PaymentMethod, orderedAlcohol, AlcoholBill
+- paymentmethods(pmid, paymentmethod): lookup table for Visit -> PaymentMethod
+- mealtypes(mtid, mealtype): lookup table for Visit -> MealType
+- visits(visitid, customerid, restaurantid, serverempid, billid, mtid, visitdate, visittime, partysize, waittime): Visit -> VisitDate, VisitTime, PartySize, WaitTime
 
-```{r, echo = FALSE, out.width = "100%", fig.align = "center"}
-knitr::include_graphics("erd.png")
-```
+### Definitions
+**1NF:**
 
+1. All attributes must contain atomic (indivisible) values. This means that each attribute in the table can only hold a single value.
+2. The relation must have no repeating groups of attributes or tuples. Each row must represent a single, distinct entity or concept.
 
+**2NF:**
 
+1. It is in 1NF.
+2. All non-prime attributes (attributes that are not part of the primary key or any candidate key) are fully functionally dependent on the entire primary key, meaning there are no partial dependencies.
 
+**3NF:**
 
-<<<<<<< HEAD
-=======
 1. It is in 2NF.
 2. No transitive dependencies exist. A transitive dependency occurs when a non-prime attribute is functionally dependent on another non-prime attribute. A non-prime attribute is an attribute that is not part of any candidate key of a relation.
 
-The original relation is in 1NF and 2NF because it has no repeating groups and the non-prime attributes depend on the entire primary key. However, values like RestaurantID repeat across many rows with their details, since non-prime attributes depend on other non-prime attributes (RestaurantID -> RestaurantName). By breaking it down into multiple tables, including lookup tables, no transitive dependencies exist, allowing for 3NF. Three more IDs were added when creating the new relations (billid, visitid, and cid) to make there is a way of identifying these tables.
->>>>>>> dcb75b63d2991367ecc55ab0f01d863d48c5edcc
+The original relation is in 1NF and 2NF because it has no repeating groups and the non-prime attributes depend on the entire primary key. However, values like RestaurantID repeat across many rows with their details, since non-prime attributes depend on other non-prime attributes (RestaurantID -> RestaurantName). By breaking it down into multiple tables, including lookup tables, no transitive dependencies exist, allowing for 3NF. Three new IDs were added when creating the new relations (billid, visitid, and cid), since no column in the original data uniquely identifies a bill, visit, or customer. Orderedalcohol is kept in bill because the alcohol bill can still be 0, even if alcohol is ordered, therefore AlcoholBill does not determine orderedAlcohol with this specific business logic.
+
+## Entity Relationship Diagram
+
+```{r erdImage, echo = FALSE, out.width = "100%", fig.align = "center"}
+knitr::include_graphics("erd.png")
+```
