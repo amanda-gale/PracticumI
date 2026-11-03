@@ -9,13 +9,6 @@ output:
 
 ## Question 1: For the relation represented by all of the columns in the CSV file and the table in the SQLite database, define all functional dependencies and list them.
 
-### Restaurants
-$$
-\begin{aligned}
-\texttt{RestaurantID} &\to \texttt{RestaurantName},\ \texttt{City},\ \texttt{State},\ \texttt{hasTableService}
-\end{aligned}
-$$
-
 ### Servers
 $$
 \begin{aligned}
@@ -25,10 +18,10 @@ $$
 \end{aligned}
 $$
 
-### Customers
+### Restaurants
 $$
 \begin{aligned}
-\texttt{CustomerEmail} &\to \texttt{CustomerName},\ \texttt{CustomerPhone},\ \texttt{LoyaltyMember}
+\texttt{RestaurantID} &\to \texttt{RestaurantName},\ \texttt{City},\ \texttt{State},\ \texttt{hasTableService}
 \end{aligned}
 $$
 
@@ -39,6 +32,13 @@ $$
 \texttt{Visit} &\to \texttt{RestaurantID},\ \texttt{ServerEmpID},\ \texttt{CustomerEmail},\ \texttt{VisitDate},\ \texttt{VisitTime}\\
 \texttt{Visit} &\to \texttt{MealType},\ \texttt{PartySize},\ \texttt{WaitTime}\\
 \texttt{Visit} &\to \texttt{FoodBill},\ \texttt{TipAmount},\ \texttt{FoodDiscountPercentage},\ \texttt{PaymentMethod},\ \texttt{orderedAlcohol},\ \texttt{AlcoholBill}
+\end{aligned}
+$$
+
+### Customers
+$$
+\begin{aligned}
+\texttt{CustomerEmail} &\to \texttt{CustomerName},\ \texttt{CustomerPhone},\ \texttt{LoyaltyMember}
 \end{aligned}
 $$
 
@@ -74,4 +74,4 @@ Relations in 3NF:
 1. It is in 2NF.
 2. No transitive dependencies exist. A transitive dependency occurs when a non-prime attribute is functionally dependent on another non-prime attribute. A non-prime attribute is an attribute that is not part of any candidate key of a relation.
 
-The original relation is in 1NF and 2NF because it has no repeating groups and the non-prime attributes depend on the entire primary key. However, values like RestaurantID repeat across many rows with their details, since non-prime attributes depend on other non-prime attributes ( RestaurantID -> RestaurantName). By breaking it down into multiple tables, including lookup tables, no transitive dependencies exist, allowing for 3NF.
+The original relation is in 1NF and 2NF because it has no repeating groups and the non-prime attributes depend on the entire primary key. However, values like RestaurantID repeat across many rows with their details, since non-prime attributes depend on other non-prime attributes (RestaurantID -> RestaurantName). By breaking it down into multiple tables, including lookup tables, no transitive dependencies exist, allowing for 3NF. Three more IDs were added when creating the new relations (billid, visitid, and cid) to make there is a way of identifying these tables.
