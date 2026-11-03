@@ -38,17 +38,9 @@ main <- function() {
   })
 
   test_that("Unique servers in CSV row count of servers table", {
-<<<<<<< HEAD
-    rs <- length(unique(df.data[, c("ServerEmpID")]))
-    ex <- dbGetQuery(dbcon, "SELECT COUNT(DISTINCT serverempid) AS n FROM visits")$n 
-    rs <- length(unique(na.omit(df.data[, c("ServerEmpID")])))
-    ex <- dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM servers 
-                     WHERE empid IN (SELECT DISTINCT serverempid FROM visits)")$n
-=======
     rs <- length(unique(na.omit(df.data[, c("ServerEmpID")])))
     ex <- dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM servers
     WHERE empid IN (SELECT DISTINCT serverempid FROM visits)")$n
->>>>>>> b55c274930adcce81729c0f45e94238881db9173
     ex <- as.numeric(ex)
 
     cat("\n")
