@@ -15,6 +15,18 @@ library(DBI)
 conn <- dbConnect(RSQLite::SQLite(), "restaurants-db-02102026.sqlitedb")
 dbListTables(conn)
 ```
+```{r}
+  dbcon <- dbConnect(
+    RMariaDB::MariaDB(),
+    host     = "ph.ms",
+    port     = 3306,
+    dbname   = "Restaurant_Project",
+    user     = "cs5200practicum",
+    password = "galekoumasfall2026"
+  )
+```
+
+
 
 ```{r}
 df <- read.csv("restaurant-visits-209874.csv", na.strings = "NA", stringsAsFactors = FALSE,
@@ -46,6 +58,9 @@ colSums(is.na(df.customers))
 
 ```{r}
 anyDuplicated(df.servers$EmpID)
+```
+```{r}
+df.customers <- dbReadTable(dbcon, "customers")
 ```
 
 

@@ -106,26 +106,16 @@ testing harness that demonstrates that the stored procedure works for both a pas
 and fail scenario. Show that the stored procedure works in a separate testing file 
 named "testBusinessLogic.R".
 
-Config SP
-# connect to DB
-# dependency installation
-# make sure tables exist
-# clear stored procedures
-# define new stored procedures
+What's left:
+final check of project directions
+catch crashing
+wrap main functions in tryCatch?
+format file headers
+test entire pipeline
+self-evaluation - one for each of us?
+customer email as a candidate key
+Do our procedures test all constraints?
 
-
-test SP
-# connect to DB
-# dependency installation
-# make sure tables exist
-# make sure tables are populated..?
-# make sure SP exist
-# test SP
-# Pass/Fail
-
-
-
-"CREATED "
 
 
 
