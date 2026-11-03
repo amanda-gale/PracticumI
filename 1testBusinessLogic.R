@@ -5,9 +5,9 @@
 
 
 if (!requireNamespace("pacman", quietly = TRUE)) {
-  install.packages("pacman", repos = "https://cloud.r-project.org")
+  install.packages("pacman")
 }
-suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB, testthat))
+suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB))
 
 main <- function() {
   dbcon <- dbConnect(
