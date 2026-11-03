@@ -24,6 +24,109 @@ drop_stored_procedure <- function(con, storedProc) {
   print(paste0("Dropped stored procedure ", storedProc))
 }
 
+
+sqlq_storeNewVisit <- function(con) {
+  sql <- paste0(
+    "CREATE PROCEDURE storeNewVisit(\n",
+    "  IN in_restaurantid INT,\n",
+    "  IN in_serverempid INT,\n",
+    "  IN in_mealtype VARCHAR(10),\n",
+    "  IN in_visitdate DATE,\n",
+    "  IN in_visittime TIME,\n",
+    "  IN in_partysize INT,\n",
+    "  IN in_waittime INT,\n",
+    "  IN in_customername VARCHAR(50),\n",
+    "  IN in_customerphone VARCHAR(20),\n",
+    "  IN in_customeremail VARCHAR(50),\n",
+    "  IN in_loyaltymember TINYINT(1),\n",
+    "  IN in_paymentmethod VARCHAR(15),\n",
+    "  IN in_foodbill DECIMAL(10,2),\n",
+    "  IN in_tipamount DECIMAL(10,2),\n",
+    "  IN in_fooddiscountpercentage DECIMAL(10,2),\n",
+    "  IN in_orderedalcohol TINYINT(1),\n",
+    "  IN in_alcoholbill DECIMAL(10,2)\n",
+    ")\n",
+    "BEGIN\n",
+    "  DECLARE v_mtid INT DEFAULT NULL;\n",
+    "  DECLARE v_pmid INT DEFAULT NULL;\n",
+    "  DECLARE v_cid INT DEFAULT NULL;\n",
+    "  DECLARE v_billid INT DEFAULT NULL;\n",
+    "\n",
+    "  DECLARE EXIT HANDLER FOR SQLEXCEPTION\n",
+    "  BEGIN\n",
+    "    ROLLBACK;\n",
+    "    RESIGNAL;\n",
+    "  END;\n",
+    "\n",
+    "  START TRANSACTION;\n",
+    "\n",
+    "  SELECT mtid INTO v_mtid FROM mealtypes WHERE mealtype = in_mealtype;\n",
+    "  IF v_mtid IS NULL THEN\n",
+    "    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid meal type';\n",
+    "  END IF;\n",
+    "\n",
+    "  SELECT pmid INTO v_pmid FROM paymentmethods WHERE paymentmethod = in_paymentmethod;\n",
+    "  IF v_pmid IS NULL THEN\n",
+    "    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid payment method';\n",
+    "  END IF;\n",
+    "\n",
+    "  IF in_customername IS NOT NULL\n",
+    "     OR in_customerphone IS NOT NULL\n",
+    "     OR in_customeremail IS NOT NULL THEN\n",
+    "\n",
+    "    SELECT cid INTO v_cid\n",
+    "    FROM customers\n",
+    "    WHERE customername  <=> in_customername\n",
+    "      AND customerphone <=> in_customerphone\n",
+    "      AND customeremail <=> in_customeremail\n",
+    "      AND loyaltymember = COALESCE(in_loyaltymember, 0)\n",
+    "    LIMIT 1;\n",
+    "\n",
+    "    IF v_cid IS NULL THEN\n",
+    "      INSERT INTO customers (customername, customerphone, customeremail, loyaltymember)\n",
+    "      VALUES (in_customername, in_customerphone, in_customeremail,\n",
+    "              COALESCE(in_loyaltymember, 0));\n",
+    "      SET v_cid = LAST_INSERT_ID();\n",
+    "    END IF;\n",
+    "  END IF;\n",
+    "\n",
+    "  INSERT INTO bill (foodbill, tipamount, fooddiscountpercentage, pmid,\n",
+    "                    orderedalcohol, alcoholbill)\n",
+    "  VALUES (in_foodbill, in_tipamount, in_fooddiscountpercentage, v_pmid,\n",
+    "          COALESCE(in_orderedalcohol, 0), in_alcoholbill);\n",
+    "\n",
+    "  SET v_billid = LAST_INSERT_ID();\n",
+    "\n",
+    "  INSERT INTO visits (customerid, restaurantid, serverempid, billid,\n",
+    "                      mtid, visitdate, visittime, partysize, waittime)\n",
+    "  VALUES (v_cid, in_restaurantid, in_serverempid, v_billid, v_mtid,\n",
+    "          in_visitdate, in_visittime, in_partysize, in_waittime);\n",
+    "\n",
+    "  COMMIT;\n",
+    "END"
+  )
+  
+  rs <- dbExecute(con, sql)
+  print("Created stored procedure storeNewVisit")
+}
+
+
+sqlq_modifyServer <- function(con) {
+  sql <- paste0("CREATE PROCEDURE modifyServer (IN id INTEGER, IN updatedname VARCHAR(50), IN updatedrate DECIMAL(4,2))",
+                " BEGIN",
+                "   IF NOT EXISTS (SELECT 1 FROM servers WHERE empid = id) THEN",
+                "     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: no server found';",
+                "   END IF;",
+                "   UPDATE servers",
+                "      SET servername = updatedname,",
+                "          hourlyrate = updatedrate",
+                "    WHERE empid = id;",
+                " END")
+  
+  rs <- dbExecute(con, sql)
+  print("Created stored procedure modifyServer")
+}
+
 main <- function() {
   # Connect to the MariaDB database
   dbcon <- dbConnect(
@@ -51,28 +154,15 @@ main <- function() {
   drop_stored_procedure(dbcon, 'storeNewVisit')
   drop_stored_procedure(dbcon, 'modifyServer')
   
+  sqlq_storeNewVisit(dbcon)
+  sqlq_modifyServer(dbcon)
+  
   # --- Store information pertaining to a new visit ---
   
-  # check for customer id, if not exists, store info
-  # SELECT customerid FROM customers WHERE customername = newValues.customername AND customerphone = newValues.customerphone AND customeremail = newValues.customeremail
-  # Insert customer info, bill info
-  # INSERT INTO bill (foodbill, tipamount, 
-          # fooddiscountpercentage, orderedalcohol, alcoholbill
-          #(SELECT pmid FROM paymentmethods WHERE paymentmethod 
-                          # = newValues.paymentmethod) as pmid) 
-          # VALUES (newValues.billamount, newValues.billdate, newValues.paymentmethodid)
-  # mt and payment info hopefully already exist 
-  # SELECT mtid FROM mealtype WHERE mealtype = newValues.mealtype
-  # store visit info using select statements to get
-  # corresponding customerid and mtids 
-  
-  sqlq_storeNewVisit <- paste0(
-  "CREATE PROCEDURE storeNewVisit(newValues)",
-  "BEGIN",
-  "END")
+  dbExecute(dbcon, "DROP PROCEDURE IF EXISTS storeNewVisit")
   
   
-  dbExecute(dbcon, sqlq)
   
+  dbExecute(dbcon, storeNewVisit)
   
 }

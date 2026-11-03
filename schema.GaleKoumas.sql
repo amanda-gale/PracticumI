@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS customers (
   customername VARCHAR(50) DEFAULT NULL,
   customerphone VARCHAR(20) DEFAULT NULL,
   customeremail VARCHAR(50) DEFAULT NULL CHECK (CustomerEmail = '' OR CustomerEmail LIKE '%_@_%._%'),
-  loyaltymember TINYINT(1) NOT NULL DEFAULT 0 CHECK (loyaltymember IN (0, 1))
+  loyaltymember TINYINT(1) DEFAULT 0 CHECK (loyaltymember IN (0, 1))
 );
 
 CREATE TABLE IF NOT EXISTS paymentmethods (
