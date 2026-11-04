@@ -5,9 +5,9 @@
 
 
 if (!requireNamespace("pacman", quietly = TRUE)) {
-  install.packages("pacman", repos = "https://cloud.r-project.org")
+  install.packages("pacman")
 }
-suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB))
+suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB, testthat))
 
 
 check_table_existence <- function(dbc, table) {
