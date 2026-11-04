@@ -1,7 +1,7 @@
 # --- Part G: Stored Procedures ---
 # --- Priamos Koumas & Amanda Gale ---
-# --- Fall 2026 ---
-
+# --- CS 5200 Fall 2026 ---
+# --- testBusinessLogic.R ---
 
 if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman")

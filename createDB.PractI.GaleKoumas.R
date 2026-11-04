@@ -1,6 +1,7 @@
 # --- Part C: Realize Database ---
 # --- Priamos Koumas & Amanda Gale ---
-# --- Fall 2026 ---
+# --- CS 5200 Fall 2026 ---
+# --- createDB.PractI.GaleKoumas.R ---
 
 if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman")
