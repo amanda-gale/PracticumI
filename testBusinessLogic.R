@@ -190,15 +190,19 @@ main <- function() {
   
   # Accepts updated hourly rate for existing EmpID
   test_that("modifyServer gives Priamos a raise", {
-    before_raise <- as.numeric(dbGetQuery(dbcon, paste0("SELECT hourlyrate FROM servers WHERE empid =", server$empid, ";")))
+    before_raise <- as.numeric(dbGetQuery(dbcon,
+                                          paste0("SELECT hourlyrate FROM servers WHERE empid = ", server$empid))$hourlyrate)
     rs <- before_raise + 10
-    dbExecute(dbcon, paste0("CALL modifyServer(", server$empid, ", 'Priamos', 35.00)"))
-    ex <- as.numeric(dbGetQuery(dbcon, paste0("SELECT hourlyrate FROM servers WHERE server$empid = ", server$empid)))
+    dbExecute(dbcon, paste0("CALL modifyServer(", server$empid, ", 'Priamos', ",
+                            sprintf("%.2f", rs), ")"))
+    ex <- as.numeric(dbGetQuery(dbcon,
+                                paste0("SELECT hourlyrate FROM servers WHERE empid = ", server$empid))$hourlyrate)
     
-    cat('\n')
+    cat("\n")
+    print("modifyServer gives Priamos a raise")
     print(if (rs == ex) "MATCH" else "MISMATCH")
-    print(paste0("Hourly rate before call: ", rs))
-    print(paste0("Hourly rate after call: ", ex))
+    print(paste0("Expected hourly rate: ", rs))
+    print(paste0("Hourly rate from DB: ", ex))
     expect_equal(rs, ex)
   })
   
