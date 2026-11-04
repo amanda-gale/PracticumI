@@ -1,7 +1,7 @@
 ---
 title: 'Part B: Design Normalized Database'
 author: "Amanda Gale & Priamos Koumas"
-date: "Fall 2026"
+date: "CS 5200 Fall 2026"
 output:
   pdf_document: default
   html_document: default
@@ -21,7 +21,7 @@ $$
 \begin{aligned}
 \texttt{ServerEmpID} &\to \texttt{ServerName},\ \texttt{StartDateHired},\ \texttt{EndDateHired},\ \texttt{HourlyRate}\\
 \texttt{ServerEmpID} &\to \texttt{BirthDate},\ \texttt{SSN},\ \texttt{rID}\\
-\texttt{SSN} &\to \texttt{ServerEmpID}
+\texttt{SSN} &\to \texttt{ServerEmpID},\ \texttt{ServerName},\ \texttt{BirthDate}
 \end{aligned}
 $$
 
