@@ -9,6 +9,18 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
 suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB, RSQLite, testthat))
 
 
+# --- Utility Functions ---
+
+check_table_existence <- function(dbc, table) {
+  # Check for table existence, stop script if non-existent
+  if (!dbExistsTable(dbc, table)) {
+    stop(paste0("Table ", table, " not yet in database. Execute createDB script before proceeding."),
+         call. = FALSE
+    )
+  }
+}
+
+
 main <- function() {
   
   dbcon <- dbConnect(
@@ -20,6 +32,17 @@ main <- function() {
     password = "galekoumasfall2026"
   )
   on.exit(dbDisconnect(dbcon), add = TRUE)
+  
+  # --- Check for Table Existence ---
+  tables <- c(
+    "restaurants", "customers", "paymentmethods",
+    "mealtypes", "servers", "bill", "visits"
+  )
+  
+  for (tbl in tables) {
+    # Halt execution is a table is non-existent
+    check_table_existence(dbcon, tbl)
+  }
 
   conn <- dbConnect(SQLite(), "restaurants-db-02102026.sqlitedb")
   on.exit(dbDisconnect(conn), add = TRUE)
@@ -94,6 +117,7 @@ main <- function() {
     rs <- as.numeric(rs$total)
     ex <- sum(df.data$AlcoholBill)
 
+    
     cat("\n")
     print(if (rs == ex) "MATCH" else "MISMATCH")
     print(paste0("Alcohol sum from DB: ", rs))
@@ -114,4 +138,6 @@ main <- function() {
   })
 }
 
-main()
+tryCatch(main(), error = function(e) {
+  cat("Error occurred:", e$message, "\n")
+})

@@ -181,4 +181,6 @@ main <- function() {
   
 }
 
-main()
+tryCatch(main(), error = function(e) {
+  cat("Error occurred:", e$message, "\n")
+})
