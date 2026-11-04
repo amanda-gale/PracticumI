@@ -9,6 +9,8 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
 suppressPackageStartupMessages(pacman::p_load(DBI, dplyr, RMariaDB, RSQLite))
 
 
+# --- Utility Functions ---
+
 check_table_existence <- function(dbc, table) {
   # Check for table existence, stop script if non-existent
   if (!dbExistsTable(dbc, table)) {
@@ -17,7 +19,6 @@ check_table_existence <- function(dbc, table) {
     )
   }
 }
-
 
 replace_values <- function(df, target = "N/A", replacement = "") {
   df[] <- lapply(df, function(col) {
@@ -29,7 +30,6 @@ replace_values <- function(df, target = "N/A", replacement = "") {
   })
   df
 }
-
 
 clear_tables <- function(dbc, tables) {
   # Function derived from Claude
@@ -45,7 +45,6 @@ clear_tables <- function(dbc, tables) {
   }
   invisible(TRUE)
 }
-
 
 insert_data <- function(dbc, table, data) {
   # Write a data frame to an existing table using manufactured
@@ -77,6 +76,7 @@ main <- function() {
   # Organize data to MySQL schema
   # Insert data into MySQL database
 
+  print("Loading data into database")
 
   # --- Connect to MariaDB ---
 
@@ -161,11 +161,7 @@ main <- function() {
   df.servers <- df.servers[-5, ]
   df.servers <- df.servers[-2, ]
 
-
-  # Check data
-  str(df.data)
-  str(df.servers)
-  str(df.restaurants)
+  print("Data cleaning complete.")
 
 
   # --- Create Data Frames for DB Tables ---

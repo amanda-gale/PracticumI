@@ -1,4 +1,4 @@
-# --- Part G: Stored Procedures ---
+# --- Part G: Add Business Logic ---
 # --- Priamos Koumas & Amanda Gale ---
 # --- Fall 2026 ---
 
@@ -10,6 +10,8 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
 }
 suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB))
 
+
+# --- Utility Functions ---
 
 check_table_existence <- function(dbc, table) {
   # Check for table existence, stop script if non-existent
@@ -134,6 +136,9 @@ sqlq_modifyServer <- function(con) {
 }
 
 main <- function() {
+  
+  print("Adding business logic to database")
+  
   # Connect to the MariaDB database
   dbcon <- dbConnect(
     RMariaDB::MariaDB(),
@@ -164,10 +169,14 @@ main <- function() {
   
   
   # --- Create Stored Procedures ---
-  tryCatch(
+  tryCatch({
     sqlq_storeNewVisit(dbcon)
     sqlq_modifyServer(dbcon)
-  ) 
+    cat("Stored procedures created successfully.\n")
+  }, error = function(e) {
+    dbDisconnect(dbcon)
+    stop("Procedure creation failed: ", conditionMessage(e), call. = FALSE)
+  })
 
   
 }

@@ -7,7 +7,7 @@
 if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman")
 }
-suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB))
+suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB, testthat))
 
 main <- function() {
   dbcon <- dbConnect(

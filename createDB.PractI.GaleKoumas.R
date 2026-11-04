@@ -1,3 +1,6 @@
+# --- Part C: Realize Database ---
+# --- Priamos Koumas & Amanda Gale ---
+# --- Fall 2026 ---
 
 if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman")
@@ -5,6 +8,9 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
 suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB))
 
 main <- function() {
+  
+  print("Creating tables in Restaurant_Project Database")
+  
   # Connect to the MariaDB database
   dbcon <- dbConnect(
     RMariaDB::MariaDB(),

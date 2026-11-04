@@ -1,4 +1,3 @@
-# --- testDBLoading.PractI.GaleKoumas.R ---
 # --- Part F: Test Data Loading Process ---
 # --- Priamos Koumas & Amanda Gale ---
 # --- Fall 2026 ---
@@ -9,7 +8,9 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
 }
 suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB, RSQLite, testthat))
 
+
 main <- function() {
+  
   dbcon <- dbConnect(
     RMariaDB::MariaDB(),
     host     = "ph.ms",
