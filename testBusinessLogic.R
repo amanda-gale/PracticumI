@@ -8,16 +8,6 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
 }
 suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB, testthat))
 
-# --- Connect to DB ---
-
-dbcon <- dbConnect(
-  RMariaDB::MariaDB(),
-  host     = "ph.ms",
-  port     = 3306,
-  dbname   = "Restaurant_Project",
-  user     = "cs5200practicum",
-  password = "galekoumasfall2026"
-)
 
 # --- Utility Functions ---
 
@@ -45,8 +35,8 @@ check_table_existence <- function(dbc, table) {
   }
 }
 
-max_id <- function(col, tbl) {
-  as.numeric(dbGetQuery(dbcon,
+max_id <- function(dbc, col, tbl) {
+  as.numeric(dbGetQuery(dbc,
                         paste0("SELECT COALESCE(MAX(", col, "), 0) AS m FROM ", tbl))$m)
 }
 
@@ -61,34 +51,48 @@ cleanup <- function() {
   }, error = function(e) cat("\nWARNING: cleanup failed:", conditionMessage(e), "\n"))
 }
 
-# --- Check for Procedures and Tables ---
-
-required_procs <- c("modifyServer", "storeNewVisit")
-check_procedure_existence(dbcon, required_procs)
-
-tables <- c(
-  "restaurants", "customers", "paymentmethods",
-  "mealtypes", "servers", "bill", "visits"
-)
-
-for (tbl in tables) {
-  # Halt execution is a table is non-existent
-  check_table_existence(dbcon, tbl)
-}
-
-# --- Store Values for Testing and Rollback ---
-server <- dbGetQuery(dbcon, "SELECT * FROM servers ORDER BY empid LIMIT 1")
-visits <- as.numeric(dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM visits")$n)
-customers <- as.numeric(dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM customers")$n)
-base_visit <- max_id("visitid", "visits")
-base_bill  <- max_id("billid",  "bill")
-base_cust  <- max_id("cid",     "customers")
 
 
 main <- function() {
   
+  # --- Connect to DB ---
+  
+  dbcon <- dbConnect(
+    RMariaDB::MariaDB(),
+    host     = "ph.ms",
+    port     = 3306,
+    dbname   = "Restaurant_Project",
+    user     = "cs5200practicum",
+    password = "galekoumasfall2026"
+  )
+  on.exit(dbDisconnect(dbcon), add = TRUE)
+  
+  # --- Check for Procedures and Tables ---
+  
+  required_procs <- c("modifyServer", "storeNewVisit")
+  check_procedure_existence(dbcon, required_procs)
+  
+  tables <- c(
+    "restaurants", "customers", "paymentmethods",
+    "mealtypes", "servers", "bill", "visits"
+  )
+  
+  for (tbl in tables) {
+    # Halt execution is a table is non-existent
+    check_table_existence(dbcon, tbl)
+  }
+  
+  # --- Store Values for Testing and Rollback ---
+  server <- dbGetQuery(dbcon, "SELECT * FROM servers ORDER BY empid LIMIT 1")
+  visits <- as.numeric(dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM visits")$n)
+  customers <- as.numeric(dbGetQuery(dbcon, "SELECT COUNT(*) AS n FROM customers")$n)
+  base_visit <- max_id(dbcon, "visitid", "visits")
+  base_bill  <- max_id(dbcon, "billid",  "bill")
+  base_cust  <- max_id(dbcon, "cid",     "customers")
+  
+  
   # --- Test storeNewVisit ---
-    
+  
   # Accepts row for new customer
   test_that("storeNewVisit adds a new visit", {
     rs <- visits + 1
@@ -124,7 +128,7 @@ main <- function() {
   # Rejects negative value for food bill
   test_that("storeNewVisit does not add negative bill value", {
     expect_error(dbExecute(dbcon, paste0("CALL storeNewVisit(", server$rid, ", ", server$empid,
-                            ", 'Breakfast', '2026-11-05', '08:23:00', 7, 20, 'Priamos', 
+                                         ", 'Breakfast', '2026-11-05', '08:23:00', 7, 20, 'Priamos', 
                             '(508) 123-4567', 'priamos@mail.org', 1, 'Mobile Payment', 
                             -100.00, 100.00, 0, 0, 0)")))
   })
@@ -225,6 +229,10 @@ main <- function() {
   test_that("modifyServer rejects a negative hourly rate", {
     expect_error(dbExecute(dbcon, paste0("CALL modifyServer(", server$empid, ", 'Priamos', -10.00)")))
   })
+  
+  cleanup()  # Rollback test data and restore server row
 }
 
-tryCatch(main(), finally = {cleanup(); dbDisconnect(dbcon)})
+tryCatch(main(), error = function(e) {
+  cat("Error occurred:", e$message, "\n")
+})
