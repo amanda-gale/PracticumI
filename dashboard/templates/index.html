@@ -134,14 +134,48 @@
     .hero-inner .about { margin-top: 0; }
     .chart { height: 280px; }
   }
+
+  /* One-screen layout: on laptop and desktop screens everything fits in the window */
+  .board { display: grid; gap: 14px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .board .card { padding: 14px 14px 10px; border-radius: 20px; display: flex; flex-direction: column; min-height: 300px; }
+  .board .card h2 { font-size: 17px; }
+  .board .card .sub { font-size: 12px; margin-bottom: 8px; }
+  .board .chart { flex: 1; height: auto; min-height: 0; }
+  .span2 { grid-column: span 2; }
+  .board .table-wrap { flex: 1; min-height: 0; overflow: auto; }
+  .board table { font-size: 12px; white-space: nowrap; }
+  .board th, .board td { padding: 5px 6px; }
+  .board thead th { position: sticky; top: 0; background: rgba(255,255,255,0.95); }
+  .hero.compact { padding: 16px 24px 0; border-radius: 22px; margin-bottom: 14px; }
+  .hero.compact .hero-inner { padding-bottom: 12px; align-items: center; }
+  .hero.compact h1 { font-size: clamp(22px, 2.6vw, 34px); }
+  .hero.compact .about { margin-top: 0; max-width: 520px; font-size: 13px; padding-right: 150px; }
+  .hero.compact .olive-branch { width: 130px; top: 6px; right: 16px; }
+  .hero.compact .meander { margin: 0 -24px; height: 14px; background-size: 28px 14px; }
+  .kpis.compact { margin-bottom: 14px; gap: 10px; }
+  .kpis.compact .kpi { padding: 10px 14px; border-radius: 16px; }
+  .kpis.compact .kpi .value { font-size: 24px; margin-top: 2px; }
+  .kpis.compact .kpi .label { font-size: 12px; }
+
+  @media (min-width: 1000px) and (min-height: 620px) {
+    html, body { height: 100%; overflow: hidden; }
+    .page.fit { height: 100vh; max-width: none; padding: 16px 22px; display: flex; flex-direction: column; }
+    .page.fit .board { flex: 1; min-height: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+    .page.fit .board .card { min-height: 0; }
+  }
+  @media (max-width: 999px) {
+    .board { grid-template-columns: 1fr; }
+    .span2 { grid-column: auto; }
+    .hero.compact .about { padding-right: 0; }
+  }
 </style>
 </head>
 <body>
 <div class="glow one" aria-hidden="true"></div>
 <div class="glow two" aria-hidden="true"></div>
 
-<div class="page">
-  <header class="hero glass">
+<div class="page fit">
+  <header class="hero glass compact">
     <svg class="olive-branch" viewBox="0 0 230 120" aria-hidden="true">
       <path d="M8 108 C 70 92, 140 62, 222 14" fill="none" stroke="#5f6e24" stroke-width="2.5" stroke-linecap="round"/>
       <g fill="#8e9e4c">
@@ -165,14 +199,14 @@
     </svg>
     <div class="hero-inner">
       <div>
-        <h1 aria-label="Restaurant Group Dashboard"><span aria-hidden="true">RΣSTΛURΛNT GRΩUP<br>DΛSHBΩΛRD</span></h1>
+        <h1 aria-label="Restaurant Group Dashboard"><span aria-hidden="true">RΣSTΛURΛNT GRΩUP DΛSHBΩΛRD</span></h1>
       </div>
       <p class="about">Visits, revenue, and customers across all {{ data.totals.restaurants }} restaurants, read live from the Practicum I MySQL database. CS 5200, Fall 2026. Amanda Gale and Priamos Koumas.</p>
     </div>
     <div class="meander" aria-hidden="true"></div>
   </header>
 
-  <section class="kpis" aria-label="Key statistics">
+  <section class="kpis compact" aria-label="Key statistics">
     <div class="kpi glass"><div class="label">Total visits</div><div class="value" id="kpi-visits"></div></div>
     <div class="kpi glass"><div class="label">Unique customers</div><div class="value" id="kpi-customers"></div></div>
     <div class="kpi glass"><div class="label">Food revenue</div><div class="value" id="kpi-food"></div></div>
@@ -181,10 +215,10 @@
     <div class="kpi glass"><div class="label">Average wait in minutes</div><div class="value" id="kpi-wait"></div></div>
   </section>
 
-  <section class="grid">
+  <section class="board" aria-label="Charts">
     <div class="card glass">
       <h2>Visits per restaurant</h2>
-      <p class="sub">Number of visits recorded at each restaurant</p>
+      <p class="sub">Visits recorded at each restaurant</p>
       <div class="chart"><canvas id="visitsByRestaurant"></canvas></div>
     </div>
     <div class="card glass">
@@ -192,15 +226,20 @@
       <p class="sub">Food and alcohol sales in dollars</p>
       <div class="chart"><canvas id="revenueByRestaurant"></canvas></div>
     </div>
-    <div class="card glass wide">
+    <div class="card glass">
+      <h2>Unique customers per restaurant</h2>
+      <p class="sub">Customers who gave contact information</p>
+      <div class="chart"><canvas id="customersByRestaurant"></canvas></div>
+    </div>
+    <div class="card glass">
+      <h2>Restaurant summary</h2>
+      <p class="sub">The numbers behind the charts</p>
+      <div class="table-wrap"><table id="summary"></table></div>
+    </div>
+    <div class="card glass span2">
       <h2>Revenue per month</h2>
       <p class="sub">Food plus alcohol sales for each month</p>
       <div class="chart"><canvas id="revenueByMonth"></canvas></div>
-    </div>
-    <div class="card glass">
-      <h2>Visits per year</h2>
-      <p class="sub">Total visits across all restaurants</p>
-      <div class="chart"><canvas id="visitsByYear"></canvas></div>
     </div>
     <div class="card glass">
       <h2>Food and alcohol per year</h2>
@@ -208,52 +247,11 @@
       <div class="chart"><canvas id="foodAlcoholByYear"></canvas></div>
     </div>
     <div class="card glass">
-      <h2>Unique customers per restaurant</h2>
-      <p class="sub">Customers who gave contact information</p>
-      <div class="chart"><canvas id="customersByRestaurant"></canvas></div>
-    </div>
-    <div class="card glass">
       <h2>Visits by meal type</h2>
       <p class="sub">Breakfast, lunch, dinner, and take-out</p>
       <div class="chart"><canvas id="visitsByMeal"></canvas></div>
     </div>
-    <div class="card glass wide">
-      <h2>Bills by payment method</h2>
-      <p class="sub">Number of bills paid each way</p>
-      <div class="chart" style="height: 220px"><canvas id="billsByPayment"></canvas></div>
-    </div>
-    <div class="card glass wide">
-      <h2>Restaurant summary</h2>
-      <p class="sub">The numbers behind the restaurant charts</p>
-      <div class="table-wrap"><table id="summary"></table></div>
-    </div>
   </section>
-
-  <footer>
-    <div class="meander" aria-hidden="true"></div>
-    <svg viewBox="0 0 230 120" aria-hidden="true">
-      <path d="M8 108 C 70 92, 140 62, 222 14" fill="none" stroke="#5f6e24" stroke-width="2.5" stroke-linecap="round"/>
-      <g fill="#8e9e4c">
-        <ellipse cx="40" cy="92" rx="17" ry="5.5" transform="rotate(-40 40 92)"/>
-        <ellipse cx="62" cy="96" rx="17" ry="5.5" transform="rotate(25 62 96)"/>
-        <ellipse cx="88" cy="74" rx="18" ry="5.5" transform="rotate(-48 88 74)"/>
-        <ellipse cx="112" cy="80" rx="18" ry="5.5" transform="rotate(18 112 80)"/>
-        <ellipse cx="136" cy="54" rx="18" ry="5.5" transform="rotate(-52 136 54)"/>
-        <ellipse cx="160" cy="58" rx="17" ry="5.5" transform="rotate(12 160 58)"/>
-        <ellipse cx="184" cy="34" rx="16" ry="5" transform="rotate(-55 184 34)"/>
-        <ellipse cx="205" cy="36" rx="15" ry="5" transform="rotate(5 205 36)"/>
-      </g>
-      <g fill="#6f7f2c" opacity="0.55">
-        <ellipse cx="74" cy="84" rx="14" ry="4.5" transform="rotate(-30 74 84)"/>
-        <ellipse cx="148" cy="44" rx="14" ry="4.5" transform="rotate(-35 148 44)"/>
-      </g>
-      <g fill="#3f4a18">
-        <circle cx="100" cy="90" r="6"/>
-        <circle cx="172" cy="48" r="5.5"/>
-      </g>
-    </svg>
-    <p>Data refreshes from the database every five minutes.</p>
-  </footer>
 </div>
 
 <script>
@@ -277,7 +275,8 @@ document.getElementById('kpi-wait').textContent = (t.avg_wait ?? 0).toFixed(1);
 
 Chart.defaults.font.family = 'Figtree, system-ui, sans-serif';
 Chart.defaults.color = C.marble;
-Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.legend.labels.boxWidth = 10;
+Chart.defaults.font.size = 11;
 Chart.defaults.plugins.tooltip.padding = 10;
 Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(19, 50, 79, 0.92)';
 Chart.defaults.plugins.tooltip.borderColor = 'rgba(255, 255, 255, 0.25)';
@@ -286,7 +285,7 @@ Chart.defaults.plugins.tooltip.cornerRadius = 10;
 
 function axes(horizontal, fmt) {
   const valueAxis = { grid: { color: C.grid }, border: { display: false }, ticks: { color: C.stone, callback: fmt } };
-  const catAxis = { grid: { display: false }, border: { color: C.grid }, ticks: { color: C.marble } };
+  const catAxis = { grid: { display: false }, border: { color: C.grid }, ticks: { color: C.marble, autoSkip: !horizontal, font: { size: horizontal ? 9.5 : 11 } } };
   return horizontal ? { x: valueAxis, y: catAxis } : { x: catAxis, y: valueAxis };
 }
 
@@ -317,7 +316,7 @@ function bar(id, labels, datasets, opts = {}) {
   });
 }
 
-const restLabels = DATA.by_restaurant.map(r => r.restaurantname + ' (' + r.rid + ')');
+const restLabels = DATA.by_restaurant.map(r => r.restaurantname);
 
 bar('visitsByRestaurant', restLabels,
     [{ label: 'Visits', data: DATA.by_restaurant.map(r => r.visits), backgroundColor: C.sky }],
@@ -328,8 +327,6 @@ bar('revenueByRestaurant', restLabels, [
     { label: 'Alcohol', data: DATA.by_restaurant.map(r => r.alcohol), backgroundColor: C.gold }
   ], { horizontal: true, stacked: true, tip: money, tick: moneyShort });
 
-bar('visitsByYear', DATA.by_year.map(r => String(r.year)),
-    [{ label: 'Visits', data: DATA.by_year.map(r => r.visits), backgroundColor: C.sky }]);
 
 bar('foodAlcoholByYear', DATA.by_year.map(r => String(r.year)), [
     { label: 'Food', data: DATA.by_year.map(r => r.food), backgroundColor: C.sky },
@@ -343,13 +340,10 @@ bar('customersByRestaurant', restLabels,
 bar('visitsByMeal', DATA.by_mealtype.map(r => r.mealtype),
     [{ label: 'Visits', data: DATA.by_mealtype.map(r => r.visits), backgroundColor: C.sky }]);
 
-bar('billsByPayment', DATA.by_payment.map(r => r.paymentmethod),
-    [{ label: 'Bills', data: DATA.by_payment.map(r => r.bills), backgroundColor: C.gold }],
-    { horizontal: true });
 
 // Monthly revenue: a line with a soft glass fill beneath it
 const monthCanvas = document.getElementById('revenueByMonth');
-const fill = monthCanvas.getContext('2d').createLinearGradient(0, 0, 0, 320);
+const fill = monthCanvas.getContext('2d').createLinearGradient(0, 0, 0, 260);
 fill.addColorStop(0, 'rgba(42, 127, 199, 0.28)');
 fill.addColorStop(1, 'rgba(42, 127, 199, 0)');
 new Chart(monthCanvas, {
@@ -372,10 +366,10 @@ new Chart(monthCanvas, {
 });
 
 const rows = DATA.by_restaurant.map(r =>
-  `<tr><td>${r.rid}</td><td>${r.restaurantname}, ${r.city}</td><td>${num(r.visits)}</td><td>${num(r.customers)}</td>` +
+  `<tr><td>${r.rid}</td><td>${r.restaurantname}</td><td>${num(r.visits)}</td><td>${num(r.customers)}</td>` +
   `<td>${money(r.food)}</td><td>${money(r.alcohol)}</td><td>${money(r.tips)}</td></tr>`).join('');
 document.getElementById('summary').innerHTML =
-  '<thead><tr><th>ID</th><th>Restaurant</th><th>Visits</th><th>Unique customers</th><th>Food</th><th>Alcohol</th><th>Tips</th></tr></thead>' +
+  '<thead><tr><th>ID</th><th>Restaurant</th><th>Visits</th><th>Cust.</th><th>Food</th><th>Alcohol</th><th>Tips</th></tr></thead>' +
   '<tbody>' + rows + '</tbody>';
 </script>
 </body>
