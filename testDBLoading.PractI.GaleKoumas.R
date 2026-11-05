@@ -4,9 +4,9 @@
 # --- testDBLoading.PractI.GaleKoumas.R ---
 
 if (!requireNamespace("pacman", quietly = TRUE)) {
-  install.packages("pacman", repos = "https://cloud.r-project.org")
+  install.packages("pacman")
 }
-suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB, RSQLite, testthat))
+suppressPackageStartupMessages(pacman::p_load(DBI, RMariaDB, testthat))
 
 
 # --- Utility Functions ---
