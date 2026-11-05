@@ -44,9 +44,9 @@ main <- function() {
     check_table_existence(dbcon, tbl)
   }
 
-  conn <- dbConnect(SQLite(), "restaurants-db-02102026.sqlitedb")
-  on.exit(dbDisconnect(conn), add = TRUE)
 
+
+  
   df.data <- read.csv("restaurant-visits-209874.csv")
 
   test_that("Unique restaurants in CSV row count of restaurants table", {
